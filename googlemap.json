@@ -1,0 +1,34 @@
+{
+  "attribution": "<a href=\"https://openstreetmap.org/about/\" target=\"_blank\">&copy; OpenStreetMap</a>",
+  "autoscale": true,
+  "bounds": [
+    -180,
+    -85,
+    180,
+    85
+  ],
+  "center": [
+    0,
+    0,
+    3
+  ],
+  "created": 1415246400000,
+  "description": "",
+  "filesize": 0,
+  "format": "png8:m=h:c=64",
+  "id": "mapbox.streets",
+  "mapbox_logo": true,
+  "maxzoom": 19,
+  "minzoom": 0,
+  "name": "Streets",
+  "private": false,
+  "scheme": "xyz",
+  "source": "mapbox:///mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6",
+  "tilejson": "2.0.0",
+  "tiles": [
+    "http://mt0.google.com/vt/lyrs=m@156000000&hl=en&x={x}&y={y}&z={z}",
+    "http://mt1.google.com/vt/lyrs=m@156000000&hl=en&x={x}&y={y}&z={z}",
+    "http://mt2.google.com/vt/lyrs=m@156000000&hl=en&x={x}&y={y}&z={z}",
+    "http://mt3.google.com/vt/lyrs=m@156000000&hl=en&x={x}&y={y}&z={z}"
+  ]
+}

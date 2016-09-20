@@ -1,0 +1,34 @@
+{
+  "attribution": "<a href=\"https://www.google.com/maps/about/\" target=\"_blank\">&copy; Google Maps</a>",
+  "autoscale": true,
+  "bounds": [
+    -180,
+    -85,
+    180,
+    85
+  ],
+  "center": [
+    0,
+    0,
+    3
+  ],
+  "created": 1415246400000,
+  "description": "",
+  "filesize": 0,
+  "format": "png8:m=h:c=64",
+  "id": "mapbox.streets",
+  "mapbox_logo": true,
+  "maxzoom": 19,
+  "minzoom": 0,
+  "name": "Streets",
+  "private": false,
+  "scheme": "xyz",
+  "source": "mapbox:///mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6",
+  "tilejson": "2.0.0",
+  "tiles": [
+    "http://otile1.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg",
+    "http://otile2.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg",
+    "http://otile3.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg",
+    "http://otile4.mqcdn.com/tiles/1.0.0/map/{z}/{x}/{y}.jpg"
+  ]
+}

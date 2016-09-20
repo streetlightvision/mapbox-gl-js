@@ -1,0 +1,35 @@
+{
+  "attribution": "<a href=\"https://www.google.com/maps/about/\" target=\"_blank\">&copy; Bing Maps</a>",
+  "autoscale": true,
+  "bounds": [
+    -180,
+    -85,
+    180,
+    85
+  ],
+  "center": [
+    0,
+    0,
+    3
+  ],
+  "created": 1415246400000,
+  "description": "",
+  "filesize": 0,
+  "format": "png8:m=h:c=64",
+  "id": "mapbox.streets",
+  "mapbox_logo": true,
+  "maxzoom": 19,
+  "minzoom": 0,
+  "name": "Streets",
+  "private": false,
+  "scheme": "xyz",
+  "source": "mapbox:///mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6",
+  "tilejson": "2.0.0",
+  "tiles": [
+    "http://ecn.t0.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=1135&n=z",
+    "http://ecn.t1.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=1135&n=z",
+    "http://ecn.t2.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=1135&n=z",
+    "http://ecn.t3.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=1135&n=z",
+    "http://ecn.t4.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=1135&n=z"
+  ]
+}
