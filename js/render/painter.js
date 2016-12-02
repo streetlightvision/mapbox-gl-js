@@ -213,7 +213,13 @@ Painter.prototype.render = function(style, options) {
     this.depthRange = (style._order.length + 2) * this.numSublayers * this.depthEpsilon;
 
     this.renderPass({isOpaquePass: true});
+    this.renderStaticBuffers();
     this.renderPass({isOpaquePass: false});
+};
+
+Painter.prototype.renderStaticBuffers = function() {
+    // console.log('renderStaticBuffers');
+    // this.gl
 };
 
 Painter.prototype.renderPass = function(options) {

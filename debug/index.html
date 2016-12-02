@@ -38,11 +38,19 @@
 
 <body>
 <div id='map'></div>
+<div id='slv'></div>
 
 <script src='/dist/mapbox-gl-dev.js'></script>
-<script src='/debug/access-token-generated.js'></script>
+<script src='http://localhost/mapbox-gl-js-master/plugin.mock.js'></script>
+<script src='http://localhost/groundcontrol/js/lib/JQuery/jquery-2.0.3.min.js'></script>
+<script src='http://localhost/groundcontrol/js/lib/rbush/rbush.min.js'></script>
+<script src='http://localhost/groundcontrol/js/lib/bluebird/bluebird.min.js'></script>
+<script src='http://localhost/groundcontrol/store/app/RealTimeBatch/src/lib/SLV.Control.WebGLMapControl.js'></script>
+<script src='http://localhost/groundcontrol/store/app/RealTimeBatch/src/lib/SLV.Control.WebGLMapControl.DeviceManager.js'></script>
 
 <script>
+var plugin = new SLV.Plugin();
+
 var map = window.map = new mapboxgl.Map({
     container: 'map',
     zoom: 0,
@@ -52,7 +60,7 @@ var map = window.map = new mapboxgl.Map({
         "sources": {
             "raster-tiles": {
                 "type": "raster",
-                "url": "http://localhost/mapbox-gl-js-master/bingmap.json",
+                "url": "http://localhost/mapbox-gl-js-master/googlemap.json",
                 "tileSize": 256
             }
         },
@@ -69,75 +77,9 @@ var map = window.map = new mapboxgl.Map({
     hash: false
 });
 
-map.addControl(new mapboxgl.Navigation());
-map.addControl(new mapboxgl.Geolocate());
-map.addControl(new mapboxgl.Scale());
-
 map.on('load', function() {
-
-    // Add a new source from our GeoJSON data and set the
-    // 'cluster' option to true.
-    map.addSource("earthquakes", {
-        type: "geojson",
-        // Point to GeoJSON data. This example visualizes all M1.0+ earthquakes
-        // from 12/22/15 to 1/21/16 as logged by USGS' Earthquake hazards program.
-        data: "http://localhost/mapbox-gl-js-master/earthquakes.geojson",
-        cluster: true,
-        clusterMaxZoom: 14, // Max zoom to cluster points on
-        clusterRadius: 50 // Radius of each cluster when clustering points (defaults to 50)
-    });
-
-    // Use the earthquakes source to create five layers:
-    // One for unclustered points, three for each cluster category,
-    // and one for cluster labels.
-    map.addLayer({
-        "id": "unclustered-points",
-        "type": "symbol",
-        "source": "earthquakes",
-        "layout": {
-            "icon-image": "marker-15"
-        }
-    });
-
-    // Display the earthquake data in three layers, each filtered to a range of
-    // count values. Each range gets a different fill color.
-    var layers = [
-        [150, '#f28cb1'],
-        [20, '#f1f075'],
-        [0, '#51bbd6']
-    ];
-
-    layers.forEach(function (layer, i) {
-        map.addLayer({
-            "id": "cluster-" + i,
-            "type": "circle",
-            "source": "earthquakes",
-            "paint": {
-                "circle-color": layer[1],
-                "circle-radius": 18
-            },
-            "filter": i === 0 ?
-                [">=", "point_count", layer[0]] :
-                ["all",
-                    [">=", "point_count", layer[0]],
-                    ["<", "point_count", layers[i - 1][0]]]
-        });
-    });
-
-    // Add a layer for the clusters' count labels
-    map.addLayer({
-        "id": "cluster-count",
-        "type": "symbol",
-        "source": "earthquakes",
-        "layout": {
-            "text-field": "{point_count}",
-            "text-font": [
-                "DIN Offc Pro Medium",
-                "Arial Unicode MS Bold"
-            ],
-            "text-size": 12
-        }
-    });
+    plugin.mapControl = new SLV.Control.WebGLMapControl(this.id + '-map', undefined, map).initialize();
+    plugin.mapControl.deviceManager.loadDevices();
 });
 
 </script>
