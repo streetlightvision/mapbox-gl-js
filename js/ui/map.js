@@ -9,7 +9,7 @@ var DOM = require('../util/dom');
 var Style = require('../style/style');
 var AnimationLoop = require('../style/animation_loop');
 var Painter = require('../render/painter');
-var StaticBufferManager = require('../slv/static_buffer_manager');
+var CustomBufferManager = require('../slv/custom_buffer_manager');
 
 var Transform = require('../geo/transform');
 var Hash = require('./hash');
@@ -966,7 +966,7 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
         }
 
         this.painter = new Painter(gl, this.transform);
-        this.staticBufferManager = new StaticBufferManager(gl);
+        this.customBufferManager = new CustomBufferManager(gl, this.transform);
     },
     /**
      * Fired when the WebGL context is lost.
@@ -1064,6 +1064,8 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
                 rotating: this.rotating,
                 zooming: this.zooming
             });
+
+            this.painter.renderCustomBuffers(this.customBufferManager.buffers);
 
             this.fire('render');
 

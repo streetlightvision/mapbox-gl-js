@@ -9,6 +9,7 @@ var pixelsToTileUnits = require('../source/pixels_to_tile_units');
 var util = require('../util/util');
 var StructArrayType = require('../util/struct_array');
 var Buffer = require('../data/buffer');
+var CustomBuffer = require('../slv/custom_buffer');
 var VertexArrayObject = require('./vertex_array_object');
 var RasterBoundsArray = require('./draw_raster').RasterBoundsArray;
 var createUniformPragmas = require('./create_uniform_pragmas');
@@ -102,6 +103,8 @@ Painter.prototype.setup = function() {
     rasterBoundsArray.emplaceBack(EXTENT, EXTENT, 32767, 32767);
     this.rasterBoundsBuffer = new Buffer(rasterBoundsArray.serialize(), RasterBoundsArray.serialize(), Buffer.BufferType.VERTEX);
     this.rasterBoundsVAO = new VertexArrayObject();
+
+    this.compileCustomProgram();
 };
 
 /*
@@ -191,6 +194,133 @@ var draw = {
     debug: require('./draw_debug')
 };
 
+Painter.prototype.compileCustomProgram = function() {
+    var gl = this.gl;
+
+    var program = gl.createProgram();
+
+    var vertex = ''+
+    'attribute vec3 position;'+
+    'attribute vec2 tex_coords;'+
+    ''+
+    'uniform mat4 uMVMatrix;'+
+    'uniform mat4 uPMatrix;'+
+    ''+
+    'varying vec2 vTextureCoord;'+
+    ''+
+    'void main() '+
+    '{'+
+    '   gl_Position = uPMatrix * uMVMatrix * vec4(position, 1.0);'+
+    '   vTextureCoord = tex_coords;'+
+    '}';
+
+    var fragment = ''+
+    'precision mediump float;'+
+    'varying vec2 vTextureCoord;'+
+    ''+
+    'uniform sampler2D uSampler;'+
+    ''+
+    'void main() '+
+    '{'+
+    '    gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));'+
+    '}';
+
+    var vs = this.createShader( vertex, gl.VERTEX_SHADER );
+    var fs = this.createShader( fragment, gl.FRAGMENT_SHADER );
+
+    if ( vs == null || fs == null ) return null;
+
+    gl.attachShader( program, vs );
+    gl.attachShader( program, fs );
+
+    gl.deleteShader( vs );
+    gl.deleteShader( fs );
+
+    gl.linkProgram( program );
+
+    if ( !gl.getProgramParameter( program, gl.LINK_STATUS ) ) {
+        var error = gl.getProgramInfoLog( program );
+        console.error( error );
+        console.error( 'VALIDATE_STATUS: ' + gl.getProgramParameter( program, gl.VALIDATE_STATUS ), 'ERROR: ' + gl.getError() );
+        return;
+    }
+
+    this.customProgram = program;
+
+    gl.useProgram( this.customProgram );
+
+    this.cacheUniformLocation( program, 'uSampler' );
+    this.cacheUniformLocation( program, 'uMVMatrix' );
+    this.cacheUniformLocation( program, 'uPMatrix' );
+
+    this.customProgram.texCoords = gl.getAttribLocation(this.customProgram, 'tex_coords');
+    gl.enableVertexAttribArray(this.customProgram.texCoords);
+
+    this.customProgram.vertexPosition = gl.getAttribLocation(this.customProgram, 'position');
+    gl.enableVertexAttribArray(this.customProgram.vertexPosition);
+};
+
+Painter.prototype.createShader = function( src, type ) {
+    var gl = this.gl;
+    var shader = gl.createShader( type );
+
+    gl.shaderSource( shader, src );
+    gl.compileShader( shader );
+
+    if ( !gl.getShaderParameter( shader, gl.COMPILE_STATUS ) )  {
+        var error = gl.getShaderInfoLog( shader );
+
+        while ((error.length > 1) && (error.charCodeAt(error.length - 1) < 32))  {
+            error = error.substring(0, error.length - 1);
+        }
+
+        console.error( error );
+        return null;
+    }
+    return shader;
+};
+
+Painter.prototype.cacheUniformLocation = function( program, label )  {
+    var gl = this.gl;
+    if ( program.uniformsCache === undefined ) {
+        program.uniformsCache = {};
+    }
+    program.uniformsCache[ label ] = gl.getUniformLocation( program, label );
+};
+
+
+Painter.prototype.renderCustomBuffers = function(buffers) {
+    var gl = this.gl;
+    if (buffers[0] !== undefined) {
+        this.currentProgram = this.customProgram;
+        gl.useProgram(this.customProgram);
+
+        // gl.uniformMatrix4fv(this.customProgram.uniformsCache['uPMatrix'], false, this.transform.projMatrix);
+        // gl.uniformMatrix4fv(this.customProgram.uniformsCache['uMVMatrix'], false, this.pixelMatrix);
+
+        // attach vertex buffer
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffers[0].buffers.vertex.buffer);
+        gl.vertexAttribPointer(this.customProgram.vertexPosition, buffers[0].buffers.vertex.itemSize, gl.FLOAT, false, 0, 0);
+
+        // attach texture buffer
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffers[0].buffers.texture.buffer);
+        gl.vertexAttribPointer(this.customProgram.texCoords, buffers[0].buffers.texture.itemSize, gl.FLOAT, false, 0, 0);
+
+        // attach index buffer
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers[0].buffers.indices.buffer);
+
+        gl.activeTexture(gl.TEXTURE0);
+        gl.uniform1i(this.customProgram.uniformsCache['uSampler'], 0);
+
+        gl.drawElements(gl.TRIANGLES, buffers[0].indicesLength, gl.UNSIGNED_SHORT, 0);
+    }
+    // for (var i=0; i<buffers.length; i++) {
+        // console.log(buffers[i].points.length);
+    // }
+    // render point just to test modelview matrix
+
+};
+
 Painter.prototype.render = function(style, options) {
     this.style = style;
     this.options = options;
@@ -213,13 +343,7 @@ Painter.prototype.render = function(style, options) {
     this.depthRange = (style._order.length + 2) * this.numSublayers * this.depthEpsilon;
 
     this.renderPass({isOpaquePass: true});
-    this.renderStaticBuffers();
     this.renderPass({isOpaquePass: false});
-};
-
-Painter.prototype.renderStaticBuffers = function() {
-    // console.log('renderStaticBuffers');
-    // this.gl
 };
 
 Painter.prototype.renderPass = function(options) {
