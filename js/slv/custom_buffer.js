@@ -24,7 +24,8 @@ function CustomBuffer(gl, transform, points) {
 		}
 	};
 
-	var statsVertices = [-1,1,0,1,1,0,1,-1,0,-1,-1,0];
+	var statsVertices = [50,50,0,100,100,0,451.227,200,0,0,0,0];
+	// var statsVertices = [-1,1,0,1,1,0,1,-1,0,-1,-1,0];
 	var statsTexture = [0,0,1,0,1,1,0,1];
 	var statsIndices = [0,1,3,1,2,3];
 

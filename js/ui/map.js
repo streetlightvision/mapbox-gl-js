@@ -967,6 +967,7 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
 
         this.painter = new Painter(gl, this.transform);
         this.customBufferManager = new CustomBufferManager(gl, this.transform);
+        this.painter.customBufferManager = this.customBufferManager;
     },
     /**
      * Fired when the WebGL context is lost.
@@ -1065,8 +1066,6 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
                 zooming: this.zooming
             });
 
-            this.painter.renderCustomBuffers(this.customBufferManager.buffers);
-
             this.fire('render');
 
             if (this.loaded() && !this._loaded) {
@@ -1083,6 +1082,8 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
             if (this._sourcesDirty || this._repaint || this._styleDirty) {
                 this._rerender();
             }
+            // this.painter.renderCustomBuffers(this.customBufferManager.buffers);
+
 
         } catch (error) {
             this.fire('error', {error: error});

@@ -13,6 +13,7 @@ var CustomBuffer = require('../slv/custom_buffer');
 var VertexArrayObject = require('./vertex_array_object');
 var RasterBoundsArray = require('./draw_raster').RasterBoundsArray;
 var createUniformPragmas = require('./create_uniform_pragmas');
+var shaders = require('mapbox-gl-shaders');
 
 module.exports = Painter;
 
@@ -199,31 +200,8 @@ Painter.prototype.compileCustomProgram = function() {
 
     var program = gl.createProgram();
 
-    var vertex = ''+
-    'attribute vec3 position;'+
-    'attribute vec2 tex_coords;'+
-    ''+
-    'uniform mat4 uMVMatrix;'+
-    'uniform mat4 uPMatrix;'+
-    ''+
-    'varying vec2 vTextureCoord;'+
-    ''+
-    'void main() '+
-    '{'+
-    '   gl_Position = uPMatrix * uMVMatrix * vec4(position, 1.0);'+
-    '   vTextureCoord = tex_coords;'+
-    '}';
-
-    var fragment = ''+
-    'precision mediump float;'+
-    'varying vec2 vTextureCoord;'+
-    ''+
-    'uniform sampler2D uSampler;'+
-    ''+
-    'void main() '+
-    '{'+
-    '    gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));'+
-    '}';
+    var vertex = shaders['custom'].vertexSource
+    var fragment = shaders['custom'].fragmentSource;
 
     var vs = this.createShader( vertex, gl.VERTEX_SHADER );
     var fs = this.createShader( fragment, gl.FRAGMENT_SHADER );
@@ -250,8 +228,7 @@ Painter.prototype.compileCustomProgram = function() {
     gl.useProgram( this.customProgram );
 
     this.cacheUniformLocation( program, 'uSampler' );
-    this.cacheUniformLocation( program, 'uMVMatrix' );
-    this.cacheUniformLocation( program, 'uPMatrix' );
+    this.cacheUniformLocation( program, 'uMVPMatrix' );
 
     this.customProgram.texCoords = gl.getAttribLocation(this.customProgram, 'tex_coords');
     gl.enableVertexAttribArray(this.customProgram.texCoords);
@@ -291,12 +268,26 @@ Painter.prototype.cacheUniformLocation = function( program, label )  {
 
 Painter.prototype.renderCustomBuffers = function(buffers) {
     var gl = this.gl;
+
+    gl.disable(gl.STENCIL_TEST);
+    this.setDepthSublayer(0);
+    // this.depthMask(false);
+
     if (buffers[0] !== undefined) {
         this.currentProgram = this.customProgram;
         gl.useProgram(this.customProgram);
 
         // gl.uniformMatrix4fv(this.customProgram.uniformsCache['uPMatrix'], false, this.transform.projMatrix);
-        // gl.uniformMatrix4fv(this.customProgram.uniformsCache['uMVMatrix'], false, this.pixelMatrix);
+
+        var scale = this.transform.worldSize / Math.pow(2, this.transform.scale);
+        // console.log(this.transform.zoom, this.transform.scale, scale);
+
+        var posMatrix = new Float64Array(16);
+        mat4.identity(posMatrix);
+        mat4.scale(posMatrix, posMatrix, [this.transform.scale, this.transform.scale, 1 ]);
+        mat4.multiply(posMatrix, this.transform.projMatrix, posMatrix);
+
+        gl.uniformMatrix4fv(this.customProgram.uniformsCache['uMVPMatrix'], false, new Float32Array(posMatrix));
 
         // attach vertex buffer
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers[0].buffers.vertex.buffer);
@@ -312,7 +303,7 @@ Painter.prototype.renderCustomBuffers = function(buffers) {
         gl.activeTexture(gl.TEXTURE0);
         gl.uniform1i(this.customProgram.uniformsCache['uSampler'], 0);
 
-        gl.drawElements(gl.TRIANGLES, buffers[0].indicesLength, gl.UNSIGNED_SHORT, 0);
+        gl.drawElements(gl.POINTS, buffers[0].indicesLength, gl.UNSIGNED_SHORT, 0);
     }
     // for (var i=0; i<buffers.length; i++) {
         // console.log(buffers[i].points.length);
@@ -344,6 +335,8 @@ Painter.prototype.render = function(style, options) {
 
     this.renderPass({isOpaquePass: true});
     this.renderPass({isOpaquePass: false});
+
+    this.renderCustomBuffers(this.customBufferManager.buffers);
 };
 
 Painter.prototype.renderPass = function(options) {
