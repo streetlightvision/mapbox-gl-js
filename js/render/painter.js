@@ -227,14 +227,14 @@ Painter.prototype.compileCustomProgram = function() {
 
     gl.useProgram( this.customProgram );
 
-    this.cacheUniformLocation( program, 'uSampler' );
-    this.cacheUniformLocation( program, 'uMVPMatrix' );
-
     this.customProgram.texCoords = gl.getAttribLocation(this.customProgram, 'tex_coords');
     gl.enableVertexAttribArray(this.customProgram.texCoords);
 
     this.customProgram.vertexPosition = gl.getAttribLocation(this.customProgram, 'position');
     gl.enableVertexAttribArray(this.customProgram.vertexPosition);
+
+    this.cacheUniformLocation( program, 'uSampler' );
+    this.cacheUniformLocation( program, 'uMVPMatrix' );
 };
 
 Painter.prototype.createShader = function( src, type ) {
@@ -269,47 +269,42 @@ Painter.prototype.cacheUniformLocation = function( program, label )  {
 Painter.prototype.renderCustomBuffers = function(buffers) {
     var gl = this.gl;
 
-    gl.disable(gl.STENCIL_TEST);
     this.setDepthSublayer(0);
-    // this.depthMask(false);
+    this.depthMask(false);
+    gl.disable(gl.DEPTH_TEST);
+    gl.disable(gl.STENCIL_TEST);
 
-    if (buffers[0] !== undefined) {
-        this.currentProgram = this.customProgram;
-        gl.useProgram(this.customProgram);
+    this.currentProgram = this.customProgram;
+    gl.useProgram(this.customProgram);
 
-        // gl.uniformMatrix4fv(this.customProgram.uniformsCache['uPMatrix'], false, this.transform.projMatrix);
+    var posMatrix = new Float64Array(16);
 
-        var scale = this.transform.worldSize / Math.pow(2, this.transform.scale);
-        // console.log(this.transform.zoom, this.transform.scale, scale);
+    mat4.identity(posMatrix);
+    mat4.scale(posMatrix, posMatrix, [this.transform.scale, this.transform.scale, 1 ]);
+    mat4.multiply(posMatrix, this.transform.projMatrix, posMatrix);
 
-        var posMatrix = new Float64Array(16);
-        mat4.identity(posMatrix);
-        mat4.scale(posMatrix, posMatrix, [this.transform.scale, this.transform.scale, 1 ]);
-        mat4.multiply(posMatrix, this.transform.projMatrix, posMatrix);
+    gl.uniformMatrix4fv(this.customProgram.uniformsCache['uMVPMatrix'], false, new Float32Array(posMatrix));
 
-        gl.uniformMatrix4fv(this.customProgram.uniformsCache['uMVPMatrix'], false, new Float32Array(posMatrix));
+    // var scale = this.transform.worldSize / Math.pow(2, this.transform.tileZoom);
+    // // console.log(this.transform.zoom, this.transform.scale, scale);
 
-        // attach vertex buffer
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffers[0].buffers.vertex.buffer);
-        gl.vertexAttribPointer(this.customProgram.vertexPosition, buffers[0].buffers.vertex.itemSize, gl.FLOAT, false, 0, 0);
+    // gl.activeTexture(gl.TEXTURE0);
+    // gl.uniform1i(this.customProgram.uniformsCache['uSampler'], 0);
 
-        // attach texture buffer
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffers[0].buffers.texture.buffer);
-        gl.vertexAttribPointer(this.customProgram.texCoords, buffers[0].buffers.texture.itemSize, gl.FLOAT, false, 0, 0);
+    for(var i=0; i<buffers.length; i++) {
+        // // attach vertex buffer
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffers[i].buffers.vertex.buffer);
+        gl.vertexAttribPointer(this.customProgram.vertexPosition, buffers[i].buffers.vertex.itemSize, gl.FLOAT, gl.FALSE, 0, 0);
 
-        // attach index buffer
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers[0].buffers.indices.buffer);
+        // // attach texture buffer
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffers[i].buffers.texture.buffer);
+        gl.vertexAttribPointer(this.customProgram.texCoords, buffers[i].buffers.texture.itemSize, gl.FLOAT, false, 0, 0);
 
-        gl.activeTexture(gl.TEXTURE0);
-        gl.uniform1i(this.customProgram.uniformsCache['uSampler'], 0);
+        // // attach index buffer
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers[i].buffers.indices.buffer);
 
-        gl.drawElements(gl.POINTS, buffers[0].indicesLength, gl.UNSIGNED_SHORT, 0);
+        gl.drawElements(gl.POINTS, buffers[i].indicesLength, gl.UNSIGNED_SHORT, 0);
     }
-    // for (var i=0; i<buffers.length; i++) {
-        // console.log(buffers[i].points.length);
-    // }
-    // render point just to test modelview matrix
-
 };
 
 Painter.prototype.render = function(style, options) {

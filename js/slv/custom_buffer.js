@@ -9,10 +9,14 @@ function CustomBuffer(gl, transform, points) {
 	this.transform = transform;
 	this.points = points;
 
+	var statsVertices = [];
+	var statsTexture = [];
+	var statsIndices = [];
+
 	this.buffers = {
 		vertex : {
 			buffer : gl.createBuffer(),
-			itemSize : 3
+			itemSize : 2
 		},
 		texture : {
 			buffer : gl.createBuffer(),
@@ -24,10 +28,16 @@ function CustomBuffer(gl, transform, points) {
 		}
 	};
 
-	var statsVertices = [50,50,0,100,100,0,451.227,200,0,0,0,0];
-	// var statsVertices = [-1,1,0,1,1,0,1,-1,0,-1,-1,0];
-	var statsTexture = [0,0,1,0,1,1,0,1];
-	var statsIndices = [0,1,3,1,2,3];
+	var index = 0;
+
+	for (var i=0; i<points.length;i++) {
+		statsVertices.push(this.lngX(points[i].lng));
+		statsVertices.push(this.latY(points[i].lat));
+		statsTexture.push(1);
+		statsTexture.push(1);
+		statsIndices.push(index++);
+	}
+
 
 	this.indicesLength = statsIndices.length;
 
@@ -44,5 +54,12 @@ function CustomBuffer(gl, transform, points) {
 util.extend(CustomBuffer.prototype, {
 	createBufferWithPoints: function(id, points) {
 
-	}
+	},
+    lngX: function(lng, worldSize) {
+        return (180 + lng) * 512 / 360;
+    },
+    latY: function(lat, worldSize) {
+        var y = 180 / Math.PI * Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360));
+        return (180 - y) * 512 / 360;
+    }
 });

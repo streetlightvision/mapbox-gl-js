@@ -14,9 +14,9 @@ function VertexArrayObject() {
 
 VertexArrayObject.prototype.bind = function(gl, program, layoutVertexBuffer, elementBuffer, vertexBuffer2) {
 
-    if (gl.extVertexArrayObject === undefined) {
-        gl.extVertexArrayObject = gl.getExtension("OES_vertex_array_object");
-    }
+    // if (gl.extVertexArrayObject === undefined) {
+    //     gl.extVertexArrayObject = gl.getExtension("OES_vertex_array_object");
+    // }
 
     var isFreshBindRequired = (
         !this.vao ||
