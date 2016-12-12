@@ -279,19 +279,21 @@ Painter.prototype.renderCustomBuffers = function(buffers) {
 
     var posMatrix = new Float64Array(16);
 
-    mat4.identity(posMatrix);
-    mat4.scale(posMatrix, posMatrix, [this.transform.scale, this.transform.scale, 1 ]);
-    mat4.multiply(posMatrix, this.transform.projMatrix, posMatrix);
-
-    gl.uniformMatrix4fv(this.customProgram.uniformsCache['uMVPMatrix'], false, new Float32Array(posMatrix));
-
     // var scale = this.transform.worldSize / Math.pow(2, this.transform.tileZoom);
     // // console.log(this.transform.zoom, this.transform.scale, scale);
 
     // gl.activeTexture(gl.TEXTURE0);
     // gl.uniform1i(this.customProgram.uniformsCache['uSampler'], 0);
 
-    for(var i=0; i<buffers.length; i++) {
+    for(var i=0; i<buffers.length; i++)
+    {
+        mat4.identity(posMatrix);
+        mat4.translate(posMatrix, posMatrix, [buffers[i].tX*this.transform.scale, buffers[i].tY*this.transform.scale, 0]);
+        mat4.scale(posMatrix, posMatrix, [this.transform.scale, this.transform.scale, 1 ]);
+        mat4.multiply(posMatrix, this.transform.projMatrix, posMatrix);
+
+        gl.uniformMatrix4fv(this.customProgram.uniformsCache['uMVPMatrix'], false, new Float32Array(posMatrix));
+
         // // attach vertex buffer
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers[i].buffers.vertex.buffer);
         gl.vertexAttribPointer(this.customProgram.vertexPosition, buffers[i].buffers.vertex.itemSize, gl.FLOAT, gl.FALSE, 0, 0);
@@ -303,7 +305,7 @@ Painter.prototype.renderCustomBuffers = function(buffers) {
         // // attach index buffer
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers[i].buffers.indices.buffer);
 
-        gl.drawElements(gl.POINTS, buffers[i].indicesLength, gl.UNSIGNED_SHORT, 0);
+        gl.drawElements(gl.TRIANGLES, buffers[i].indicesLength, gl.UNSIGNED_SHORT, 0);
     }
 };
 
@@ -331,7 +333,7 @@ Painter.prototype.render = function(style, options) {
     this.renderPass({isOpaquePass: true});
     this.renderPass({isOpaquePass: false});
 
-    this.renderCustomBuffers(this.customBufferManager.buffers);
+    this.renderCustomBuffers(this.customBufferManager.staticBuffers);
 };
 
 Painter.prototype.renderPass = function(options) {

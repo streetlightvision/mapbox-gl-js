@@ -4,10 +4,16 @@ var util = require('../util/util');
 
 module.exports = CustomBuffer;
 
-function CustomBuffer(gl, transform, points) {
+function CustomBuffer(gl, transform, points, quadrant) {
 	this.gl = gl;
 	this.transform = transform;
 	this.points = points;
+	this.quadrant = quadrant;
+
+	var quadrantIncement = {
+        x: 360/this.quadrant.worldDivisions,
+        y: 180/this.quadrant.worldDivisions
+    }
 
 	var statsVertices = [];
 	var statsTexture = [];
@@ -30,12 +36,43 @@ function CustomBuffer(gl, transform, points) {
 
 	var index = 0;
 
+	var scale = 10000;
+
+	var quadX = quadrantIncement.x*this.quadrant.col;
+	var quadY = quadrantIncement.y*((this.quadrant.worldDivisions)-this.quadrant.row);
+
+	this.tX = this.lngX(quadX-180);
+    this.tY = this.latY(quadY);
+
+	// var quadY = 0;
+
+    var deltaX = 0.000012917493386243386*scale;
+    var deltaY = 0.00001291749339316084*scale;
+
 	for (var i=0; i<points.length;i++) {
-		statsVertices.push(this.lngX(points[i].lng));
-		statsVertices.push(this.latY(points[i].lat));
+		statsVertices.push(this.lngX(points[i].lng-quadX-deltaX));
+		statsVertices.push(this.latY(points[i].lat+quadY+deltaY));
+		statsVertices.push(this.lngX(points[i].lng-quadX+deltaX));
+		statsVertices.push(this.latY(points[i].lat+quadY+deltaY));
+		statsVertices.push(this.lngX(points[i].lng-quadX+deltaX));
+		statsVertices.push(this.latY(points[i].lat+quadY-deltaY));
+		statsVertices.push(this.lngX(points[i].lng-quadX-deltaX));
+		statsVertices.push(this.latY(points[i].lat+quadY-deltaY));
 		statsTexture.push(1);
 		statsTexture.push(1);
-		statsIndices.push(index++);
+		statsTexture.push(1);
+		statsTexture.push(1);
+		statsTexture.push(1);
+		statsTexture.push(1);
+		statsTexture.push(1);
+		statsTexture.push(1);
+		statsIndices.push(index);
+		statsIndices.push(index+1);
+		statsIndices.push(index+3);
+		statsIndices.push(index+1);
+		statsIndices.push(index+2);
+		statsIndices.push(index+3);
+		index += 4;
 	}
 
 
@@ -56,7 +93,7 @@ util.extend(CustomBuffer.prototype, {
 
 	},
     lngX: function(lng, worldSize) {
-        return (180 + lng) * 512 / 360;
+        return ((180 + lng) * 512 / 360);
     },
     latY: function(lat, worldSize) {
         var y = 180 / Math.PI * Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360));

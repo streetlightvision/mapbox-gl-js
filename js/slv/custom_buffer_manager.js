@@ -10,20 +10,14 @@ function CustomBufferManager(gl, transform) {
 	this.gl = gl;
 	this.transform = transform;
 	console.log('CustomBufferManager');
-	this.buffers = [];
+	this.staticBuffers = [];
+	this.currentStaticBuffer = 0;
 };
 
 util.extend(CustomBufferManager.prototype, {
-	createStaticBufferWithPoints: function(id, points) {
-		this.buffers.push(new CustomBuffer(this.gl, this.transform, points));
-		// this.buffer = gl.createBuffer();
-		// gl.bindBuffer( gl.ARRAY_BUFFER, this.buffer);
+	createStaticBufferWithPoints: function(points, quadrant) {
+		this.staticBuffers.push(new CustomBuffer(this.gl, this.transform, points, quadrant));
 
-		// for(var i=0; i < points.length; i++) {
-		// 	var point = this.transform.project(new LngLat(points[i].lng, points[i].lat));
-		// 	if (i == 0) {
-		// 		console.log(point);
-		// 	}
-		// }
+		return this.currentStaticBuffer++;
 	}
 });
