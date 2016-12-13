@@ -11,8 +11,8 @@ function CustomBuffer(gl, transform, points, quadrant) {
 	this.quadrant = quadrant;
 
 	var quadrantIncement = {
-        x: 360/this.quadrant.worldDivisions,
-        y: 180/this.quadrant.worldDivisions
+        x: 360/this.quadrant.lngDivisions,
+        y: 180/this.quadrant.latDivisions
     }
 
 	var statsVertices = [];
@@ -36,28 +36,26 @@ function CustomBuffer(gl, transform, points, quadrant) {
 
 	var index = 0;
 
-	var scale = 10000;
+	var scale = 3;
 
 	var quadX = quadrantIncement.x*this.quadrant.col;
-	var quadY = quadrantIncement.y*((this.quadrant.worldDivisions)-this.quadrant.row);
+	var quadY = quadrantIncement.y*this.quadrant.row;
 
-	this.tX = this.lngX(quadX-180);
-    this.tY = this.latY(quadY);
-
-	// var quadY = 0;
+	this.tX = quadX * (this.transform.tileSize / 360);
+	this.tY = quadY * (this.transform.tileSize / 180);
 
     var deltaX = 0.000012917493386243386*scale;
-    var deltaY = 0.00001291749339316084*scale;
+    var deltaY = 0.000011*scale;
 
 	for (var i=0; i<points.length;i++) {
-		statsVertices.push(this.lngX(points[i].lng-quadX-deltaX));
-		statsVertices.push(this.latY(points[i].lat+quadY+deltaY));
-		statsVertices.push(this.lngX(points[i].lng-quadX+deltaX));
-		statsVertices.push(this.latY(points[i].lat+quadY+deltaY));
-		statsVertices.push(this.lngX(points[i].lng-quadX+deltaX));
-		statsVertices.push(this.latY(points[i].lat+quadY-deltaY));
-		statsVertices.push(this.lngX(points[i].lng-quadX-deltaX));
-		statsVertices.push(this.latY(points[i].lat+quadY-deltaY));
+		statsVertices.push(this.lngX(points[i].lng-deltaX)-this.tX);
+		statsVertices.push(this.latY(points[i].lat+deltaY)-this.tY);
+		statsVertices.push(this.lngX(points[i].lng+deltaX)-this.tX);
+		statsVertices.push(this.latY(points[i].lat+deltaY)-this.tY);
+		statsVertices.push(this.lngX(points[i].lng+deltaX)-this.tX);
+		statsVertices.push(this.latY(points[i].lat-deltaY)-this.tY);
+		statsVertices.push(this.lngX(points[i].lng-deltaX)-this.tX);
+		statsVertices.push(this.latY(points[i].lat-deltaY)-this.tY);
 		statsTexture.push(1);
 		statsTexture.push(1);
 		statsTexture.push(1);

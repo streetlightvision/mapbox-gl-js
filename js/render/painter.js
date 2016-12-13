@@ -279,9 +279,6 @@ Painter.prototype.renderCustomBuffers = function(buffers) {
 
     var posMatrix = new Float64Array(16);
 
-    // var scale = this.transform.worldSize / Math.pow(2, this.transform.tileZoom);
-    // // console.log(this.transform.zoom, this.transform.scale, scale);
-
     // gl.activeTexture(gl.TEXTURE0);
     // gl.uniform1i(this.customProgram.uniformsCache['uSampler'], 0);
 
@@ -294,15 +291,15 @@ Painter.prototype.renderCustomBuffers = function(buffers) {
 
         gl.uniformMatrix4fv(this.customProgram.uniformsCache['uMVPMatrix'], false, new Float32Array(posMatrix));
 
-        // // attach vertex buffer
+        // attach vertex buffer
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers[i].buffers.vertex.buffer);
         gl.vertexAttribPointer(this.customProgram.vertexPosition, buffers[i].buffers.vertex.itemSize, gl.FLOAT, gl.FALSE, 0, 0);
 
-        // // attach texture buffer
+        // attach texture buffer
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers[i].buffers.texture.buffer);
         gl.vertexAttribPointer(this.customProgram.texCoords, buffers[i].buffers.texture.itemSize, gl.FLOAT, false, 0, 0);
 
-        // // attach index buffer
+        // attach index buffer
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers[i].buffers.indices.buffer);
 
         gl.drawElements(gl.TRIANGLES, buffers[i].indicesLength, gl.UNSIGNED_SHORT, 0);
