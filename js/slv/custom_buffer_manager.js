@@ -9,7 +9,6 @@ module.exports = CustomBufferManager;
 function CustomBufferManager(gl, transform) {
 	this.gl = gl;
 	this.transform = transform;
-	console.log('CustomBufferManager');
 	this.staticBuffers = [];
 	this.currentStaticBuffer = 0;
 };

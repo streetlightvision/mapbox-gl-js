@@ -23,6 +23,8 @@ var Point = require('point-geometry');
 var Attribution = require('./control/attribution');
 var isSupported = require('mapbox-gl-supported');
 
+var Quadrant = require('../slv/quadrant');
+
 var defaultMinZoom = 0;
 var defaultMaxZoom = 20;
 var defaultOptions = {
@@ -53,7 +55,12 @@ var defaultOptions = {
     failIfMajorPerformanceCaveat: false,
     preserveDrawingBuffer: false,
 
-    trackResize: true
+    trackResize: true,
+
+    // SLV
+    devicesPerQuadrant: 16383,
+    lngDivisions: 8,
+    latDivisions: 4
 };
 
 /**
@@ -205,11 +212,47 @@ var Map = module.exports = function(options) {
     this.on('source.error', fireError);
     this.on('tile.error', fireError);
     this.on('layer.error', fireError);
+
+    this.devicesPerQuadrant = options.devicesPerQuadrant;
+
+    this.lngDivisions = options.lngDivisions;
+    this.latDivisions = options.latDivisions;
+
+    this.quadrantIncement = {
+        x: 360/this.lngDivisions,
+        y: 180/this.latDivisions
+    }
+
+    this.quadrant = [];
+
+    for (var i=0; i<this.latDivisions; i++) {
+        this.quadrant[i] = [];
+        for (var j=0; j<this.lngDivisions; j++) {
+            this.quadrant[i][j] = new Quadrant(i, j, this, this.lngDivisions, this.latDivisions);
+        }
+    }
 };
 
 util.extend(Map.prototype, Evented);
 util.extend(Map.prototype, Camera.prototype);
 util.extend(Map.prototype, /** @lends Map.prototype */{
+
+    addPoint: function(point) {
+        var quadrantCoords = Quadrant.findQuadrant(
+            point.lng,
+            point.lat,
+            this.quadrantIncement.x,
+            this.quadrantIncement.y);
+        this.quadrant[quadrantCoords.row][quadrantCoords.col].addDevice(point);
+    },
+
+    finishedLoadingPoints: function() {
+        for (var i=0; i<this.latDivisions; i++) {
+            for (var j=0; j<this.lngDivisions; j++) {
+                this.quadrant[i][j].finishedLoading();
+            }
+        }
+    },
 
     /**
      * Adds a [`Control`](#Control) to the map, calling `control.addTo(this)`.
