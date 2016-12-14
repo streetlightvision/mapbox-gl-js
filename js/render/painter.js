@@ -267,6 +267,8 @@ Painter.prototype.cacheUniformLocation = function( program, label )  {
 
 
 Painter.prototype.renderCustomBuffers = function(buffers) {
+    if (this.transform.zoom < 8.0) return;
+
     var gl = this.gl;
 
     this.setDepthSublayer(0);
@@ -282,11 +284,13 @@ Painter.prototype.renderCustomBuffers = function(buffers) {
     // gl.activeTexture(gl.TEXTURE0);
     // gl.uniform1i(this.customProgram.uniformsCache['uSampler'], 0);
 
+    var scale = this.transform.scale;
+
     for(var i=0; i<buffers.length; i++)
     {
         mat4.identity(posMatrix);
-        mat4.translate(posMatrix, posMatrix, [buffers[i].tX*this.transform.scale, buffers[i].tY*this.transform.scale, 0]);
-        mat4.scale(posMatrix, posMatrix, [this.transform.scale, this.transform.scale, 1 ]);
+        mat4.translate(posMatrix, posMatrix, [buffers[i].tX*scale, buffers[i].tY*scale, 0]);
+        mat4.scale(posMatrix, posMatrix, [scale, scale, 1 ]);
         mat4.multiply(posMatrix, this.transform.projMatrix, posMatrix);
 
         gl.uniformMatrix4fv(this.customProgram.uniformsCache['uMVPMatrix'], false, new Float32Array(posMatrix));

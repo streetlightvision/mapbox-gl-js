@@ -41,21 +41,23 @@ function CustomBuffer(gl, transform, points, quadrant) {
 	var quadX = quadrantIncement.x*this.quadrant.col;
 	var quadY = quadrantIncement.y*this.quadrant.row;
 
-	this.tX = quadX * (this.transform.tileSize / 360);
-	this.tY = quadY * (this.transform.tileSize / 180);
+	this.tX = this.lngX(quadX - 180);
+	this.tY = this.latY(90 - quadY);
 
-    var deltaX = 0.000012917493386243386*scale;
-    var deltaY = 0.000011*scale;
+    var deltaX = 0.00001291749338624338*scale;
+    var deltaY = 0.00001291749339316084*scale;
 
 	for (var i=0; i<points.length;i++) {
-		statsVertices.push(this.lngX(points[i].lng-deltaX)-this.tX);
-		statsVertices.push(this.latY(points[i].lat+deltaY)-this.tY);
-		statsVertices.push(this.lngX(points[i].lng+deltaX)-this.tX);
-		statsVertices.push(this.latY(points[i].lat+deltaY)-this.tY);
-		statsVertices.push(this.lngX(points[i].lng+deltaX)-this.tX);
-		statsVertices.push(this.latY(points[i].lat-deltaY)-this.tY);
-		statsVertices.push(this.lngX(points[i].lng-deltaX)-this.tX);
-		statsVertices.push(this.latY(points[i].lat-deltaY)-this.tY);
+		var x = this.lngX(points[i].lng);
+		var y = this.latY(points[i].lat);
+		statsVertices.push(x-this.tX-deltaX);
+		statsVertices.push(y-this.tY+deltaY);
+		statsVertices.push(x-this.tX+deltaX);
+		statsVertices.push(y-this.tY+deltaY);
+		statsVertices.push(x-this.tX+deltaX);
+		statsVertices.push(y-this.tY-deltaY);
+		statsVertices.push(x-this.tX-deltaX);
+		statsVertices.push(y-this.tY-deltaY);
 		statsTexture.push(1);
 		statsTexture.push(1);
 		statsTexture.push(1);
@@ -90,10 +92,10 @@ util.extend(CustomBuffer.prototype, {
 	createBufferWithPoints: function(id, points) {
 
 	},
-    lngX: function(lng, worldSize) {
+    lngX: function(lng) {
         return ((180 + lng) * 512 / 360);
     },
-    latY: function(lat, worldSize) {
+    latY: function(lat) {
         var y = 180 / Math.PI * Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360));
         return (180 - y) * 512 / 360;
     }

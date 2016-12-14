@@ -59,8 +59,8 @@ var defaultOptions = {
 
     // SLV
     devicesPerQuadrant: 16383,
-    lngDivisions: 8,
-    latDivisions: 4
+    lngDivisions: 16,
+    latDivisions: 16
 };
 
 /**
