@@ -70,7 +70,7 @@ var map = window.map = new mapboxgl.Map({
             "minzoom": 0,
             "maxzoom": 22
         }],
-        "sprite": "http://localhost/mapbox-gl-js-master/sprites/light",
+        "sprite": "http://localhost/mapbox-gl-js-master/slv/sprites/dark",
         "glyphs": "http://localhost/mapbox-gl-js-master/glyph/{fontstack}/{range}.pbf",
     },
     hash: false
@@ -78,7 +78,9 @@ var map = window.map = new mapboxgl.Map({
 
 map.on('load', function() {
     plugin.mapControl = new SLV.Control.WebGLMapControl(this.id + '-map', undefined, map).initialize();
-    plugin.mapControl.deviceManager.loadDevices();
+    plugin.mapControl.deviceManager.loadDevices(1000002);
+
+
 });
 
 </script>

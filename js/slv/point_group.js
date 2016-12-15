@@ -15,6 +15,5 @@ PointGroup.prototype.buildBuffer = function () {
 
 PointGroup.prototype.addDevice = function (device) {
 	this.devices.push(device);
-    device.group = this;
     device.index = this.index++;
 };

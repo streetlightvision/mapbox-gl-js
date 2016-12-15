@@ -233,8 +233,9 @@ Painter.prototype.compileCustomProgram = function() {
     this.customProgram.vertexPosition = gl.getAttribLocation(this.customProgram, 'position');
     gl.enableVertexAttribArray(this.customProgram.vertexPosition);
 
-    this.cacheUniformLocation( program, 'uSampler' );
-    this.cacheUniformLocation( program, 'uMVPMatrix' );
+    this.cacheUniformLocation( program, 'u_sampler' );
+    this.cacheUniformLocation( program, 'u_texsize' );
+    this.cacheUniformLocation( program, 'u_mvp_matrix' );
 };
 
 Painter.prototype.createShader = function( src, type ) {
@@ -279,12 +280,13 @@ Painter.prototype.renderCustomBuffers = function(buffers) {
     this.currentProgram = this.customProgram;
     gl.useProgram(this.customProgram);
 
-    var posMatrix = new Float64Array(16);
-
-    // gl.activeTexture(gl.TEXTURE0);
-    // gl.uniform1i(this.customProgram.uniformsCache['uSampler'], 0);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.uniform1i(this.customProgram.uniformsCache['u_sampler'], 0);
+    gl.uniform2f(this.customProgram.uniformsCache['u_texsize'], this.spriteAtlas.width / 4, this.spriteAtlas.height / 4);
+    this.spriteAtlas.bind(gl, true);
 
     var scale = this.transform.scale;
+    var posMatrix = new Float64Array(16);
 
     for(var i=0; i<buffers.length; i++)
     {
@@ -293,7 +295,7 @@ Painter.prototype.renderCustomBuffers = function(buffers) {
         mat4.scale(posMatrix, posMatrix, [scale, scale, 1 ]);
         mat4.multiply(posMatrix, this.transform.projMatrix, posMatrix);
 
-        gl.uniformMatrix4fv(this.customProgram.uniformsCache['uMVPMatrix'], false, new Float32Array(posMatrix));
+        gl.uniformMatrix4fv(this.customProgram.uniformsCache['u_mvp_matrix'], false, new Float32Array(posMatrix));
 
         // attach vertex buffer
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers[i].buffers.vertex.buffer);

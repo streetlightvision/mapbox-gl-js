@@ -1,0 +1,156 @@
+{
+  "device": {
+    "width": 22,
+    "height": 22,
+    "x": 0,
+    "y": 0,
+    "pixelRatio": 1
+  },
+  "streetlight": {
+    "width": 22,
+    "height": 22,
+    "x": 22,
+    "y": 0,
+    "pixelRatio": 1
+  },
+  "switch": {
+    "width": 22,
+    "height": 22,
+    "x": 44,
+    "y": 0,
+    "pixelRatio": 1
+  },
+  "cameraip": {
+    "width": 22,
+    "height": 22,
+    "x": 66,
+    "y": 0,
+    "pixelRatio": 1
+  },
+  "controllerdevice": {
+    "width": 22,
+    "height": 22,
+    "x": 88,
+    "y": 0,
+    "pixelRatio": 1
+  },
+  "electricalCounter": {
+    "width": 22,
+    "height": 22,
+    "x": 110,
+    "y": 0,
+    "pixelRatio": 1
+  },
+  "vehicleChargingStation": {
+    "width": 22,
+    "height": 22,
+    "x": 132,
+    "y": 0,
+    "pixelRatio": 1
+  },
+  "envSensor": {
+    "width": 22,
+    "height": 22,
+    "x": 154,
+    "y": 0,
+    "pixelRatio": 1
+  },
+  "input": {
+    "width": 22,
+    "height": 22,
+    "x": 176,
+    "y": 0,
+    "pixelRatio": 1
+  },
+  "output": {
+    "width": 22,
+    "height": 22,
+    "x": 198,
+    "y": 0,
+    "pixelRatio": 1
+  },
+  "nature": {
+    "width": 22,
+    "height": 22,
+    "x": 220,
+    "y": 0,
+    "pixelRatio": 1
+  },
+  "tank": {
+    "width": 22,
+    "height": 22,
+    "x": 242,
+    "y": 0,
+    "pixelRatio": 1
+  },
+  "cityObject": {
+    "width": 22,
+    "height": 22,
+    "x": 264,
+    "y": 0,
+    "pixelRatio": 1
+  },
+  "transportSignage": {
+    "width": 22,
+    "height": 22,
+    "x": 286,
+    "y": 0,
+    "pixelRatio": 1
+  },
+  "building": {
+    "width": 22,
+    "height": 22,
+    "x": 308,
+    "y": 0,
+    "pixelRatio": 1
+  },
+  "audioPlayer": {
+    "width": 22,
+    "height": 22,
+    "x": 330,
+    "y": 0,
+    "pixelRatio": 1
+  },
+  "weatherStation": {
+    "width": 22,
+    "height": 22,
+    "x": 0,
+    "y": 22,
+    "pixelRatio": 1
+  },
+  "occupancySensor": {
+    "width": 22,
+    "height": 22,
+    "x": 22,
+    "y": 22,
+    "pixelRatio": 1
+  },
+  "wasteContainer": {
+    "width": 22,
+    "height": 22,
+    "x": 44,
+    "y": 22,
+    "pixelRatio": 1
+  },
+  "parkingPlace": {
+    "width": 22,
+    "height": 22,
+    "x": 66,
+    "y": 22,
+    "pixelRatio": 1
+  },
+  "networkComponent": {
+    "width": 22,
+    "height": 22,
+    "x": 88,
+    "y": 22,
+    "pixelRatio": 1
+  },
+  "vehicle": {
+    "width": 22,
+    "height": 22,
+    "x": 110,
+    "y": 22,
+    "pixelRatio": 1
+  }
+}

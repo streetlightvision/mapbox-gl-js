@@ -13,8 +13,6 @@ function ImageSprite(base) {
 
     var format = this.retina ? '@2x' : '';
 
-    console.log();
-
     ajax.getJSON(base+'/sprite'+format+'.json', function(err, data) {
         if (err) {
             this.fire('error', {error: err});

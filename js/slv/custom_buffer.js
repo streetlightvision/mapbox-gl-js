@@ -4,11 +4,12 @@ var util = require('../util/util');
 
 module.exports = CustomBuffer;
 
-function CustomBuffer(gl, transform, points, quadrant) {
+function CustomBuffer(gl, transform, painter, points, quadrant) {
 	this.gl = gl;
 	this.transform = transform;
 	this.points = points;
 	this.quadrant = quadrant;
+	this.painter = painter;
 
 	var quadrantIncement = {
         x: 360/this.quadrant.lngDivisions,
@@ -58,14 +59,33 @@ function CustomBuffer(gl, transform, points, quadrant) {
 		statsVertices.push(y-this.tY-deltaY);
 		statsVertices.push(x-this.tX-deltaX);
 		statsVertices.push(y-this.tY-deltaY);
-		statsTexture.push(1);
-		statsTexture.push(1);
-		statsTexture.push(1);
-		statsTexture.push(1);
-		statsTexture.push(1);
-		statsTexture.push(1);
-		statsTexture.push(1);
-		statsTexture.push(1);
+
+		if (this.painter.spriteAtlas.sprite !== undefined) {
+			var sprites = this.painter.spriteAtlas.images;
+			if (sprites[points[i].sprite] !== undefined) {
+				var sprite = sprites[points[i].sprite];
+				statsTexture.push((sprite.rect.x) / 4);
+				statsTexture.push((sprite.rect.y + sprite.rect.height) / 4);
+				statsTexture.push((sprite.rect.x + sprite.rect.width) / 4);
+				statsTexture.push((sprite.rect.y + sprite.rect.height) / 4);
+				statsTexture.push((sprite.rect.x + sprite.rect.width) / 4);
+				statsTexture.push((sprite.rect.y) / 4);
+				statsTexture.push(sprite.rect.x / 4);
+				statsTexture.push(sprite.rect.y / 4);
+			}
+		}
+		else {
+			console.warn('Point '+point[i].id+' doesn\'t have a sprite on the current sprite map!');
+			statsTexture.push(0);
+			statsTexture.push(0);
+			statsTexture.push(0);
+			statsTexture.push(0);
+			statsTexture.push(0);
+			statsTexture.push(0);
+			statsTexture.push(0);
+			statsTexture.push(0);
+		}
+
 		statsIndices.push(index);
 		statsIndices.push(index+1);
 		statsIndices.push(index+3);
@@ -74,7 +94,6 @@ function CustomBuffer(gl, transform, points, quadrant) {
 		statsIndices.push(index+3);
 		index += 4;
 	}
-
 
 	this.indicesLength = statsIndices.length;
 
@@ -89,10 +108,7 @@ function CustomBuffer(gl, transform, points, quadrant) {
 };
 
 util.extend(CustomBuffer.prototype, {
-	createBufferWithPoints: function(id, points) {
-
-	},
-    lngX: function(lng) {
+	lngX: function(lng) {
         return ((180 + lng) * 512 / 360);
     },
     latY: function(lat) {

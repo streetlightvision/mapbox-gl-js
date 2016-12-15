@@ -254,6 +254,16 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
         }
     },
 
+    initializeCustomSprites: function() {
+        var icons = Object.keys(this.style.sprite.data);
+
+        this.style['get icons'](0, {
+            icons: icons
+        }, function() {
+            console.log('added icons to sprite map');
+        });
+    },
+
     /**
      * Adds a [`Control`](#Control) to the map, calling `control.addTo(this)`.
      *
@@ -1009,7 +1019,7 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
         }
 
         this.painter = new Painter(gl, this.transform);
-        this.customBufferManager = new CustomBufferManager(gl, this.transform);
+        this.customBufferManager = new CustomBufferManager(gl, this.transform, this.painter);
         this.painter.customBufferManager = this.customBufferManager;
     },
     /**
@@ -1112,6 +1122,7 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
             this.fire('render');
 
             if (this.loaded() && !this._loaded) {
+                this.initializeCustomSprites();
                 this._loaded = true;
                 this.fire('load');
             }

@@ -34,6 +34,7 @@ Quadrant.prototype.addDevice = function (device) {
 		this.addStaticGroup();
 	}
 
+	device.bufferIndex = this.currentStaticGroup;
 	this.staticGroups[this.currentStaticGroup].addDevice(device);
 };
 
