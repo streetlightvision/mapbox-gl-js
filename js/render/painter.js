@@ -268,7 +268,7 @@ Painter.prototype.cacheUniformLocation = function( program, label )  {
 
 
 Painter.prototype.renderCustomBuffers = function(buffers) {
-    if (this.transform.zoom < 8.0) return;
+    if (this.transform.zoom < 11.0) return;
 
     var gl = this.gl;
 

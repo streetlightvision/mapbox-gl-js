@@ -15,9 +15,9 @@ function CustomBufferManager(gl, transform, painter) {
 };
 
 util.extend(CustomBufferManager.prototype, {
-	createStaticBufferWithPoints: function(points, quadrant) {
-		this.staticBuffers.push(new CustomBuffer(this.gl, this.transform, this.painter, points, quadrant));
-
-		return this.currentStaticBuffer++;
+	createStaticBufferWithMarkers: function(markers, quadrant) {
+		var buffer = new CustomBuffer(this.gl, this.transform, this.painter, markers, quadrant);
+		this.staticBuffers.push(buffer);
+		return buffer;
 	}
 });

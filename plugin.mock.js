@@ -8,8 +8,8 @@ SLV.Plugin = function () {
     this.userContext = {
         serviceAddress: {
             protocol: 'http:',
-            host: 'gbuzogany.freeboxos.fr',
-            port: '51338',
+            host: 'localhost',
+            port: '8080',
             path: 'reports/'
         }
     }

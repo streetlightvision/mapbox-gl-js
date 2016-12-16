@@ -58,7 +58,6 @@ var defaultOptions = {
     trackResize: true,
 
     // SLV
-    devicesPerQuadrant: 16383,
     lngDivisions: 16,
     latDivisions: 16
 };
@@ -201,6 +200,8 @@ var Map = module.exports = function(options) {
 
     this._classes = [];
 
+    this.selectedMarkers = [];
+
     this.resize();
 
     if (options.classes) this.setClasses(options.classes);
@@ -212,8 +213,6 @@ var Map = module.exports = function(options) {
     this.on('source.error', fireError);
     this.on('tile.error', fireError);
     this.on('layer.error', fireError);
-
-    this.devicesPerQuadrant = options.devicesPerQuadrant;
 
     this.lngDivisions = options.lngDivisions;
     this.latDivisions = options.latDivisions;
@@ -237,13 +236,43 @@ util.extend(Map.prototype, Evented);
 util.extend(Map.prototype, Camera.prototype);
 util.extend(Map.prototype, /** @lends Map.prototype */{
 
-    addPoint: function(point) {
-        var quadrantCoords = Quadrant.findQuadrant(
-            point.lng,
-            point.lat,
+    addMarker: function(marker) {
+        this.findQuadrant(marker).addMarker(marker);
+    },
+
+    findQuadrant: function(marker) {
+        var qc = Quadrant.findQuadrant(
+            marker.lng,
+            marker.lat,
             this.quadrantIncement.x,
             this.quadrantIncement.y);
-        this.quadrant[quadrantCoords.row][quadrantCoords.col].addDevice(point);
+
+        return this.quadrant[qc.row][qc.col];
+    },
+
+    setSelection: function(markers) {
+        var quadrantsToRefresh = {};
+
+        for (var i=0; i<this.selectedMarkers.length; i++) {
+            this.findQuadrant(this.selectedMarkers[i]).unselectMarker(this.selectedMarkers[i]);
+        }
+        this.selectedMarkers = markers;
+
+        for (var i=0; i<markers.length; i++) {
+            this.findQuadrant(markers[i]).selectMarker(markers[i]);
+        }
+        var shouldRender = false;
+
+        for (var i=0; i<this.latDivisions; i++) {
+            for (var j=0; j<this.lngDivisions; j++) {
+                if (this.quadrant[i][j].refreshIfNeeded()) {
+                    shouldRender = true;
+                }
+            }
+        }
+        if (shouldRender == true) {
+            this._render();
+        }
     },
 
     finishedLoadingPoints: function() {
