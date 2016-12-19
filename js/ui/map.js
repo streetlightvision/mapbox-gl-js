@@ -218,15 +218,15 @@ var Map = module.exports = function(options) {
     this.latDivisions = options.latDivisions;
 
     this.quadrantIncement = {
-        x: 360/this.lngDivisions,
-        y: 180/this.latDivisions
-    }
+        x: 360 / this.lngDivisions,
+        y: 180 / this.latDivisions
+    };
 
     this.quadrant = [];
 
-    for (var i=0; i<this.latDivisions; i++) {
+    for (var i = 0; i < this.latDivisions; i++) {
         this.quadrant[i] = [];
-        for (var j=0; j<this.lngDivisions; j++) {
+        for (var j = 0; j < this.lngDivisions; j++) {
             this.quadrant[i][j] = new Quadrant(i, j, this, this.lngDivisions, this.latDivisions);
         }
     }
@@ -251,33 +251,31 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
     },
 
     setSelection: function(markers) {
-        var quadrantsToRefresh = {};
-
-        for (var i=0; i<this.selectedMarkers.length; i++) {
+        for (var i = 0; i < this.selectedMarkers.length; i++) {
             this.findQuadrant(this.selectedMarkers[i]).unselectMarker(this.selectedMarkers[i]);
         }
-        this.selectedMarkers = markers;
+        this.selectedMarkers = markers.slice();
 
-        for (var i=0; i<markers.length; i++) {
+        for (var i = 0; i < markers.length; i++) {
             this.findQuadrant(markers[i]).selectMarker(markers[i]);
         }
         var shouldRender = false;
 
-        for (var i=0; i<this.latDivisions; i++) {
-            for (var j=0; j<this.lngDivisions; j++) {
+        for (var i = 0; i < this.latDivisions; i++) {
+            for (var j = 0; j < this.lngDivisions; j++) {
                 if (this.quadrant[i][j].refreshIfNeeded()) {
                     shouldRender = true;
                 }
             }
         }
-        if (shouldRender == true) {
+        if (shouldRender === true) {
             this._render();
         }
     },
 
     finishedLoadingPoints: function() {
-        for (var i=0; i<this.latDivisions; i++) {
-            for (var j=0; j<this.lngDivisions; j++) {
+        for (var i = 0; i < this.latDivisions; i++) {
+            for (var j = 0; j < this.lngDivisions; j++) {
                 this.quadrant[i][j].finishedLoading();
             }
         }
