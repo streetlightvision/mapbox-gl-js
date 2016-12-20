@@ -44,7 +44,7 @@ util.extend(CustomBuffer.prototype, {
 
         var index = 0;
 
-        var scale = 10;
+        var scale = 14;
 
         var quadX = quadrantIncement.x * this.quadrant.col;
         var quadY = quadrantIncement.y * this.quadrant.row;
@@ -110,7 +110,7 @@ util.extend(CustomBuffer.prototype, {
             }
         }
         if (addDefault === true) {
-            console.warn('Marker ' + marker + ' doesn\'t have a sprite on the current sprite map!');
+            console.warn('Marker doesn\'t have a sprite on the current sprite map!', marker);
             statsTexture.push(0);
             statsTexture.push(0);
             statsTexture.push(0);

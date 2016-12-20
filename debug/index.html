@@ -45,9 +45,11 @@
 <script src='http://localhost/groundcontrol/js/lib/JQuery/jquery-2.0.3.min.js'></script>
 <script src='http://localhost/groundcontrol/js/lib/rbush/rbush.min.js'></script>
 <script src='http://localhost/groundcontrol/js/lib/bluebird/bluebird.min.js'></script>
+<script src='http://localhost/groundcontrol/src/slv.system/SLV.System.Event.js'></script>
 <script src='http://localhost/groundcontrol/store/app/RealTimeBatch/src/lib/SLV.Control.WebGLMapControl.js'></script>
 <script src='http://localhost/groundcontrol/store/app/RealTimeBatch/src/lib/SLV.Control.WebGLMapControl.DeviceManager.js'></script>
 <script>
+'use strict';
 var plugin = new SLV.Plugin();
 
 var map = window.map = new mapboxgl.Map({
@@ -78,7 +80,7 @@ var map = window.map = new mapboxgl.Map({
 
 map.on('load', function() {
     plugin.mapControl = new SLV.Control.WebGLMapControl(this.id + '-map', undefined, map).initialize();
-    plugin.mapControl.deviceManager.loadDevices(1000002);
+    plugin.mapControl.deviceManager.loadDevices(10000);
 
 
 });
