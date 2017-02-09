@@ -33,6 +33,9 @@
                 -1px 1px 0 #fff,
                  1px 1px 0 #fff;
         }
+        #slv {
+            display: none;
+        }
     </style>
 </head>
 
@@ -41,21 +44,33 @@
 <div id='slv'></div>
 
 <script src='/dist/mapbox-gl-dev.js'></script>
-<script src='http://localhost/mapbox-gl-js-master/plugin.mock.js'></script>
-<script src='http://localhost/groundcontrol/js/lib/JQuery/jquery-2.0.3.min.js'></script>
-<script src='http://localhost/groundcontrol/js/lib/rbush/rbush.min.js'></script>
-<script src='http://localhost/groundcontrol/js/lib/bluebird/bluebird.min.js'></script>
-<script src='http://localhost/groundcontrol/src/slv.system/SLV.System.Event.js'></script>
-<script src='http://localhost/groundcontrol/store/app/RealTimeBatch/src/lib/SLV.Control.WebGLMapControl.js'></script>
-<script src='http://localhost/groundcontrol/store/app/RealTimeBatch/src/lib/SLV.Control.WebGLMapControl.DeviceManager.js'></script>
+<script src='/debug/gc_bootstrap.js'></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.4.7/bluebird.min.js"></script>
 <script>
 'use strict';
-var plugin = new SLV.Plugin();
+
+var gc_path = 'http://localhost/groundcontrol/';
+var plugin;
+
+var options = {
+    hasView: false,
+    autoStart : false,
+    service : {
+        protocol: 'https:',
+        host: 'beast.gbuzogany.com',
+        port: '443',
+        path: 'reports/'
+    },
+    path: gc_path
+};
+
+loadDependencies();
 
 var map = window.map = new mapboxgl.Map({
     container: 'map',
-    zoom: 0,
-    center: [-77.01866, 38.888],
+    zoom: 15,
+    center: [139.4849, 35.9127],
     style: {
         "version": 8,
         "sources": {
@@ -77,14 +92,6 @@ var map = window.map = new mapboxgl.Map({
     },
     hash: false
 });
-
-map.on('load', function() {
-    plugin.mapControl = new SLV.Control.WebGLMapControl(this.id + '-map', undefined, map).initialize();
-    plugin.mapControl.deviceManager.loadDevices(10000);
-
-
-});
-
 </script>
 
 </body>
