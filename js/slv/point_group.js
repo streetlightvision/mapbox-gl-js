@@ -50,3 +50,40 @@ PointGroup.prototype.unselectMarker = function (marker) {
     }
     return false;
 };
+
+
+PointGroup.prototype.clear = function () {
+    if (this.buffer !== undefined) {
+        this.customBufferManager.removeBuffer(this.buffer);
+        this.buffer.clear();
+        delete this.buffer;
+    }
+};
+
+PointGroup.prototype.rebuild = function () {
+    this.clear();
+    this.buildBuffer();
+};
+
+PointGroup.prototype.findMarker = function (marker) {
+    for (var i=0; i < this.markers.length; i++) {
+        if (this.markers[i] !== undefined && this.markers[i].id == marker.id) {
+            return i;
+        }
+    }
+    return -1;
+};
+
+PointGroup.prototype.removeMarker = function (marker) {
+    var index = findMarker(marker);
+    if (index > 0) {
+        this.removeMarkerFromIndex(index);
+    }
+};
+
+PointGroup.prototype.removeMarkerFromIndex = function (index) {
+    if (index >= 0) {
+        delete this.markers[index];
+        this.rebuild();
+    }
+};

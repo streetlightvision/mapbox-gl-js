@@ -18,5 +18,15 @@ util.extend(CustomBufferManager.prototype, {
         var buffer = new CustomBuffer(this.gl, this.transform, this.painter, markers, quadrant);
         this.staticBuffers.push(buffer);
         return buffer;
+    },
+    removeBuffer: function(buffer) {
+        if (buffer !== undefined) {
+            for (var i=0; i<this.staticBuffers.length; i++) {
+                if (this.staticBuffers[i] === buffer) {
+                    this.staticBuffers.splice(i, 1);
+                    break;
+                }
+            }
+        }
     }
 });

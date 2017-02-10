@@ -240,6 +240,15 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
         this.findQuadrant(marker).addMarker(marker);
     },
 
+    // marker must have lng, lat & id to be able to find out which buffer it is in
+    removeMarker: function(marker, render) {
+        var changed = this.findQuadrant(marker).removeMarker(marker);
+        if (changed && render) {
+            this._render();
+        }
+        return changed;
+    },
+
     findQuadrant: function(marker) {
         var qc = Quadrant.findQuadrant(
             marker.lng,
@@ -250,10 +259,45 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
         return this.quadrant[qc.row][qc.col];
     },
 
+
+    addToSelection: function(markers) {
+        var shouldRender = false;
+        for (var i = 0; i < markers.length; i++) {
+            var found = false;
+            for (var j = 0; j < this.selectedMarkers.length; j++) {
+                if (markers[i].id == this.selectedMarkers[j].id) {
+                    found = true;
+                    break;
+                }
+            }
+            if (found === false) {
+                this.selectedMarkers.push(markers[i]);
+            }
+        }
+
+        for (var i = 0; i < markers.length; i++) {
+            this.findQuadrant(markers[i]).selectMarker(markers[i]);
+        }
+
+        for (var i = 0; i < this.latDivisions; i++) {
+            for (var j = 0; j < this.lngDivisions; j++) {
+                if (this.quadrant[i][j].refreshIfNeeded()) {
+                    shouldRender = true;
+                }
+            }
+        }
+
+        if (shouldRender === true) {
+            this._render();
+        }
+    },
+
     setSelection: function(markers) {
         for (var i = 0; i < this.selectedMarkers.length; i++) {
             this.findQuadrant(this.selectedMarkers[i]).unselectMarker(this.selectedMarkers[i]);
         }
+
+        // creates a clone
         this.selectedMarkers = markers.slice();
 
         for (var i = 0; i < markers.length; i++) {
@@ -289,6 +333,23 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
         }, function() {
             console.log('added icons to sprite map');
         });
+    },
+
+    reset: function() {
+        for (var i = 0; i < this.latDivisions; i++) {
+            for (var j = 0; j < this.lngDivisions; j++) {
+                this.quadrant[i][j].resetBuffers();
+            }
+        }
+        this._render();
+    },
+
+    rebuild: function() {
+        for (var i = 0; i < this.latDivisions; i++) {
+            for (var j = 0; j < this.lngDivisions; j++) {
+                this.quadrant[i][j].rebuild();
+            }
+        }
     },
 
     /**

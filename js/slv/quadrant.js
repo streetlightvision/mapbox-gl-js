@@ -45,6 +45,24 @@ Quadrant.prototype.addMarker = function (marker) {
     this.staticGroups[this.currentStaticGroup].addMarker(marker);
 };
 
+Quadrant.prototype.removeMarker = function (marker) {
+    if (marker.groupIndex !== undefined) {
+        this.staticGroups[marker.groupIndex].removeMarker(marker);
+        return true;
+    }
+    else
+    {
+        for (var i=0; i < this.staticGroups.length; i++) {
+            var found = this.staticGroups[i].findMarker(marker);
+            if (found >= 0) {
+                this.staticGroups[i].removeMarkerFromIndex(found);
+                return true;
+            }
+        }
+    }
+    return false;
+};
+
 Quadrant.prototype.finishedLoading = function() {
     if (this.staticGroups[this.currentStaticGroup].markers.length > 0) {
         this.staticGroups[this.currentStaticGroup].buildBuffer();
@@ -81,4 +99,19 @@ Quadrant.prototype.refreshIfNeeded = function() {
     } else {
         return false;
     }
+};
+
+Quadrant.prototype.resetBuffers = function() {
+    for (var i=0; i<this.staticGroups.length; i++) {
+        this.staticGroups[i].clear();
+        delete this.staticGroups[i];
+    }
+    this.staticGroups = [new PointGroup(this.customBufferManager, this)];
+};
+
+Quadrant.prototype.rebuild = function() {
+    for (var i=0; i<this.staticGroups.length; i++) {
+        this.staticGroups[i].rebuild();
+    }
+    this.needsRefresh = true;
 };

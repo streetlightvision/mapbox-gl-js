@@ -56,6 +56,8 @@ util.extend(CustomBuffer.prototype, {
         var deltaY = 0.00001291749339316084 * scale;
 
         for (var i = 0; i < markers.length; i++) {
+            if (markers[i] === undefined) continue;
+
             var x = this.lngX(markers[i].lng);
             var y = this.latY(markers[i].lat);
             statsVertices.push(x - this.tX - deltaX);
@@ -127,5 +129,11 @@ util.extend(CustomBuffer.prototype, {
     latY: function(lat) {
         var y = 180 / Math.PI * Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360));
         return (180 - y) * 512 / 360;
+    },
+    clear: function() {
+        var gl = this.gl;
+        gl.deleteBuffer(this.buffers.vertex.buffer);
+        gl.deleteBuffer(this.buffers.texture.buffer);
+        gl.deleteBuffer(this.buffers.indices.buffer);
     }
 });
