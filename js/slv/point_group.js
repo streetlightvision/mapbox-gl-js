@@ -66,7 +66,7 @@ PointGroup.prototype.rebuild = function () {
 };
 
 PointGroup.prototype.findMarker = function (marker) {
-    for (var i=0; i < this.markers.length; i++) {
+    for (var i = 0; i < this.markers.length; i++) {
         if (this.markers[i] !== undefined && this.markers[i].id == marker.id) {
             return i;
         }
@@ -75,8 +75,8 @@ PointGroup.prototype.findMarker = function (marker) {
 };
 
 PointGroup.prototype.removeMarker = function (marker) {
-    var index = findMarker(marker);
-    if (index > 0) {
+    var index = this.findMarker(marker);
+    if (index >= 0) {
         this.removeMarkerFromIndex(index);
     }
 };

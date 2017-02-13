@@ -46,18 +46,11 @@ Quadrant.prototype.addMarker = function (marker) {
 };
 
 Quadrant.prototype.removeMarker = function (marker) {
-    if (marker.groupIndex !== undefined) {
-        this.staticGroups[marker.groupIndex].removeMarker(marker);
-        return true;
-    }
-    else
-    {
-        for (var i=0; i < this.staticGroups.length; i++) {
-            var found = this.staticGroups[i].findMarker(marker);
-            if (found >= 0) {
-                this.staticGroups[i].removeMarkerFromIndex(found);
-                return true;
-            }
+    for (var i = 0; i < this.staticGroups.length; i++) {
+        var found = this.staticGroups[i].findMarker(marker);
+        if (found >= 0) {
+            this.staticGroups[i].removeMarkerFromIndex(found);
+            return true;
         }
     }
     return false;
@@ -102,7 +95,7 @@ Quadrant.prototype.refreshIfNeeded = function() {
 };
 
 Quadrant.prototype.resetBuffers = function() {
-    for (var i=0; i<this.staticGroups.length; i++) {
+    for (var i = 0; i < this.staticGroups.length; i++) {
         this.staticGroups[i].clear();
         delete this.staticGroups[i];
     }
@@ -110,7 +103,7 @@ Quadrant.prototype.resetBuffers = function() {
 };
 
 Quadrant.prototype.rebuild = function() {
-    for (var i=0; i<this.staticGroups.length; i++) {
+    for (var i = 0; i < this.staticGroups.length; i++) {
         this.staticGroups[i].rebuild();
     }
     this.needsRefresh = true;
