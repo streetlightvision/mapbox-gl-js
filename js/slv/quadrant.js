@@ -100,6 +100,7 @@ Quadrant.prototype.resetBuffers = function() {
         delete this.staticGroups[i];
     }
     this.staticGroups = [new PointGroup(this.customBufferManager, this)];
+    this.currentStaticGroup = 0;
 };
 
 Quadrant.prototype.rebuild = function() {
