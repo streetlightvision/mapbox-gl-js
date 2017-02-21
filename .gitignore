@@ -11,3 +11,4 @@ coverage
 .nyc_output
 /debug/access-token-generated.js
 /bench/index-generated.js
+.idea/
