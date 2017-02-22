@@ -135,5 +135,11 @@ util.extend(CustomBuffer.prototype, {
         gl.deleteBuffer(this.buffers.vertex.buffer);
         gl.deleteBuffer(this.buffers.texture.buffer);
         gl.deleteBuffer(this.buffers.indices.buffer);
+    },
+    isEmpty: function() {
+        if (this.markers.length > 0)
+            return false;
+        else
+            return true;
     }
 });

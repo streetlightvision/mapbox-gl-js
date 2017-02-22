@@ -9,7 +9,6 @@ var pixelsToTileUnits = require('../source/pixels_to_tile_units');
 var util = require('../util/util');
 var StructArrayType = require('../util/struct_array');
 var Buffer = require('../data/buffer');
-var CustomBuffer = require('../slv/custom_buffer');
 var VertexArrayObject = require('./vertex_array_object');
 var RasterBoundsArray = require('./draw_raster').RasterBoundsArray;
 var createUniformPragmas = require('./create_uniform_pragmas');
@@ -200,32 +199,32 @@ Painter.prototype.compileCustomProgram = function() {
 
     var program = gl.createProgram();
 
-    var vertex = shaders['custom'].vertexSource
+    var vertex = shaders['custom'].vertexSource;
     var fragment = shaders['custom'].fragmentSource;
 
-    var vs = this.createShader( vertex, gl.VERTEX_SHADER );
-    var fs = this.createShader( fragment, gl.FRAGMENT_SHADER );
+    var vs = this.createShader(vertex, gl.VERTEX_SHADER);
+    var fs = this.createShader(fragment, gl.FRAGMENT_SHADER);
 
-    if ( vs == null || fs == null ) return null;
+    if (vs == null || fs == null) return null;
 
-    gl.attachShader( program, vs );
-    gl.attachShader( program, fs );
+    gl.attachShader(program, vs);
+    gl.attachShader(program, fs);
 
-    gl.deleteShader( vs );
-    gl.deleteShader( fs );
+    gl.deleteShader(vs);
+    gl.deleteShader(fs);
 
-    gl.linkProgram( program );
+    gl.linkProgram(program);
 
-    if ( !gl.getProgramParameter( program, gl.LINK_STATUS ) ) {
-        var error = gl.getProgramInfoLog( program );
-        console.error( error );
-        console.error( 'VALIDATE_STATUS: ' + gl.getProgramParameter( program, gl.VALIDATE_STATUS ), 'ERROR: ' + gl.getError() );
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        var error = gl.getProgramInfoLog(program);
+        console.error(error);
+        console.error('VALIDATE_STATUS: ' + gl.getProgramParameter(program, gl.VALIDATE_STATUS), 'ERROR: ' + gl.getError());
         return;
     }
 
     this.customProgram = program;
 
-    gl.useProgram( this.customProgram );
+    gl.useProgram(this.customProgram);
 
     this.customProgram.texCoords = gl.getAttribLocation(this.customProgram, 'tex_coords');
     gl.enableVertexAttribArray(this.customProgram.texCoords);
@@ -233,37 +232,37 @@ Painter.prototype.compileCustomProgram = function() {
     this.customProgram.vertexPosition = gl.getAttribLocation(this.customProgram, 'position');
     gl.enableVertexAttribArray(this.customProgram.vertexPosition);
 
-    this.cacheUniformLocation( program, 'u_sampler' );
-    this.cacheUniformLocation( program, 'u_texsize' );
-    this.cacheUniformLocation( program, 'u_mvp_matrix' );
+    this.cacheUniformLocation(program, 'u_sampler');
+    this.cacheUniformLocation(program, 'u_texsize');
+    this.cacheUniformLocation(program, 'u_mvp_matrix');
 };
 
-Painter.prototype.createShader = function( src, type ) {
+Painter.prototype.createShader = function(src, type) {
     var gl = this.gl;
-    var shader = gl.createShader( type );
+    var shader = gl.createShader(type);
 
-    gl.shaderSource( shader, src );
-    gl.compileShader( shader );
+    gl.shaderSource(shader, src);
+    gl.compileShader(shader);
 
-    if ( !gl.getShaderParameter( shader, gl.COMPILE_STATUS ) )  {
-        var error = gl.getShaderInfoLog( shader );
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS))  {
+        var error = gl.getShaderInfoLog(shader);
 
         while ((error.length > 1) && (error.charCodeAt(error.length - 1) < 32))  {
             error = error.substring(0, error.length - 1);
         }
 
-        console.error( error );
+        console.error(error);
         return null;
     }
     return shader;
 };
 
-Painter.prototype.cacheUniformLocation = function( program, label )  {
+Painter.prototype.cacheUniformLocation = function(program, label)  {
     var gl = this.gl;
-    if ( program.uniformsCache === undefined ) {
+    if (program.uniformsCache === undefined) {
         program.uniformsCache = {};
     }
-    program.uniformsCache[ label ] = gl.getUniformLocation( program, label );
+    program.uniformsCache[ label ] = gl.getUniformLocation(program, label);
 };
 
 
@@ -288,10 +287,10 @@ Painter.prototype.renderCustomBuffers = function(buffers) {
     var scale = this.transform.scale;
     var posMatrix = new Float64Array(16);
 
-    for(var i=0; i<buffers.length; i++)
-    {
+    for (var i = 0; i < buffers.length; i++) {
+        if (buffers[i].isEmpty() === true) continue;
         mat4.identity(posMatrix);
-        mat4.translate(posMatrix, posMatrix, [buffers[i].tX*scale, buffers[i].tY*scale, 0]);
+        mat4.translate(posMatrix, posMatrix, [buffers[i].tX * scale, buffers[i].tY * scale, 0]);
         mat4.scale(posMatrix, posMatrix, [scale, scale, 1 ]);
         mat4.multiply(posMatrix, this.transform.projMatrix, posMatrix);
 

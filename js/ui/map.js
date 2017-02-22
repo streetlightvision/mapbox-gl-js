@@ -223,11 +223,14 @@ var Map = module.exports = function(options) {
     };
 
     this.quadrant = [];
+    this.dynamicQuadrant = [];
 
     for (var i = 0; i < this.latDivisions; i++) {
         this.quadrant[i] = [];
+        this.dynamicQuadrant[i] = [];
         for (var j = 0; j < this.lngDivisions; j++) {
             this.quadrant[i][j] = new Quadrant(i, j, this, this.lngDivisions, this.latDivisions);
+            this.dynamicQuadrant[i][j] = new Quadrant(i, j, this, this.lngDivisions, this.latDivisions);
         }
     }
 };
@@ -240,6 +243,11 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
         this.findQuadrant(marker).addMarker(marker);
     },
 
+    addDynamicMarker: function(marker) {
+        var qc = this.findQuadrantCoords(marker);
+        this.dynamicQuadrant[qc.row][qc.col].addMarker(marker);
+    },
+
     // marker must have lng, lat & id to be able to find out which buffer it is in
     removeMarker: function(marker, render) {
         var changed = this.findQuadrant(marker).removeMarker(marker);
@@ -250,22 +258,25 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
     },
 
     findQuadrant: function(marker) {
-        var qc = Quadrant.findQuadrant(
-            marker.lng,
-            marker.lat,
-            this.quadrantIncement.x,
-            this.quadrantIncement.y);
+        var qc = this.findQuadrantCoords(marker);
 
         return this.quadrant[qc.row][qc.col];
     },
 
+    findQuadrantCoords: function(marker) {
+        return Quadrant.findQuadrant(
+            marker.lng,
+            marker.lat,
+            this.quadrantIncement.x,
+            this.quadrantIncement.y);
+    },
 
     addToSelection: function(markers) {
         var shouldRender = false;
         for (var i = 0; i < markers.length; i++) {
             var found = false;
             for (var j = 0; j < this.selectedMarkers.length; j++) {
-                if (markers[i].id == this.selectedMarkers[j].id) {
+                if (markers[i].id === this.selectedMarkers[j].id) {
                     found = true;
                     break;
                 }
@@ -350,6 +361,7 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
                 this.quadrant[i][j].rebuild();
             }
         }
+        this._render();
     },
 
     /**
