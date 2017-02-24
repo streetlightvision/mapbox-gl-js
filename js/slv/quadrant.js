@@ -56,10 +56,16 @@ Quadrant.prototype.removeMarker = function (marker) {
     return false;
 };
 
-Quadrant.prototype.finishedLoading = function() {
+Quadrant.prototype.buildBuffers = function() {
     if (this.staticGroups[this.currentStaticGroup].markers.length > 0) {
         this.staticGroups[this.currentStaticGroup].buildBuffer();
         this.addStaticGroup();
+    }
+};
+
+Quadrant.prototype.rebuildBuffers = function() {
+    for (var i = 0; i < this.staticGroups.length; i++) {
+        this.staticGroups[i].rebuild();
     }
 };
 

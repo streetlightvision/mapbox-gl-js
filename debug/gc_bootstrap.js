@@ -1,14 +1,18 @@
+'use strict';
 
-function start_plugin()
-{
+function startPlugin() {
     plugin = new SLV.Plugin('slv', true);
 
     plugin.load(options, function(error) {
         if (!error) {
             plugin.initialize(undefined, function(error) {
                 if (!error) {
-                    plugin.mapControl = new SLV.Control.WebGLMapControl(this.id + '-map', undefined, map).initialize();
-                    // plugin.mapControl.deviceManager.loadDevices(10000);
+                    var options = {
+                        autoZoom: true,
+                        multiSelection: true,
+                        dragMarkers: true
+                    };
+                    plugin.mapControl = new SLV.Control.WebGLMapControl(this.id + '-map', options, map).initialize();
                 } else {
                     console.log(error);
                 }
@@ -25,8 +29,8 @@ function loadDependency(path) {
 
         script.onload = function() {
             resolve();
-        }
-        script.src = gc_path + path;
+        };
+        script.src = gcPath + path;
 
         document.head.appendChild(script);
     });
@@ -42,11 +46,11 @@ function loadDependencies() {
     ];
     var requests = [];
 
-    for(var i=0; i<deps.length;i++) {
+    for (var i = 0; i < deps.length; i++) {
         requests.push(loadDependency(deps[i]));
     }
 
     Promise.all(requests).then(function(responses) {
-        start_plugin();
+        startPlugin();
     });
 }

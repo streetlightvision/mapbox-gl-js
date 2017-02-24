@@ -243,14 +243,27 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
         this.findQuadrant(marker).addMarker(marker);
     },
 
-    addDynamicMarker: function(marker) {
-        var qc = this.findQuadrantCoords(marker);
-        this.dynamicQuadrant[qc.row][qc.col].addMarker(marker);
-    },
-
     // marker must have lng, lat & id to be able to find out which buffer it is in
     removeMarker: function(marker, render) {
         var changed = this.findQuadrant(marker).removeMarker(marker);
+        if (changed && render) {
+            this._render();
+        }
+        return changed;
+    },
+
+    addDynamicMarker: function(marker) {
+        var qc = this.findQuadrantCoords(marker);
+        var quadrant = this.dynamicQuadrant[qc.row][qc.col];
+        quadrant.addMarker(marker);
+        quadrant.rebuildBuffers();
+    },
+
+    removeDynamicMarker: function(marker, render) {
+        var qc = this.findQuadrantCoords(marker);
+        var quadrant = this.dynamicQuadrant[qc.row][qc.col];
+        var changed = quadrant.removeMarker(marker);
+        quadrant.rebuildBuffers();
         if (changed && render) {
             this._render();
         }
@@ -328,10 +341,10 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
         }
     },
 
-    finishedLoadingPoints: function() {
+    buildBuffers: function() {
         for (var i = 0; i < this.latDivisions; i++) {
             for (var j = 0; j < this.lngDivisions; j++) {
-                this.quadrant[i][j].finishedLoading();
+                this.quadrant[i][j].buildBuffers();
             }
         }
     },

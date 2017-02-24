@@ -12,6 +12,7 @@ function PointGroup(customBufferManager, quadrant) {
 
 PointGroup.prototype.buildBuffer = function () {
     this.buffer = this.customBufferManager.createStaticBufferWithMarkers(this.markers, this.quadrant);
+    this.needsRefresh = false;
 };
 
 PointGroup.prototype.setNeedsRefresh = function () {
@@ -31,6 +32,7 @@ PointGroup.prototype.refreshIfNeeded = function () {
 PointGroup.prototype.addMarker = function (marker) {
     marker.index = this.index++;
     this.markers.push(marker);
+    this.needsRefresh = true;
 };
 
 PointGroup.prototype.selectMarker = function (marker) {
@@ -61,13 +63,15 @@ PointGroup.prototype.clear = function () {
 };
 
 PointGroup.prototype.rebuild = function () {
-    this.clear();
-    this.buildBuffer();
+    if (this.needsRefresh === true) {
+        this.clear();
+        this.buildBuffer();
+    }
 };
 
 PointGroup.prototype.findMarker = function (marker) {
     for (var i = 0; i < this.markers.length; i++) {
-        if (this.markers[i] !== undefined && this.markers[i].id == marker.id) {
+        if (this.markers[i] !== undefined && this.markers[i].id === marker.id) {
             return i;
         }
     }
@@ -84,6 +88,7 @@ PointGroup.prototype.removeMarker = function (marker) {
 PointGroup.prototype.removeMarkerFromIndex = function (index) {
     if (index >= 0) {
         delete this.markers[index];
+        this.needsRefresh = true;
         this.rebuild();
     }
 };
