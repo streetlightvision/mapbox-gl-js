@@ -271,6 +271,9 @@ Painter.prototype.renderCustomBuffers = function(buffers) {
 
     var gl = this.gl;
 
+    gl.enableVertexAttribArray(this.customProgram.texCoords);
+    gl.enableVertexAttribArray(this.customProgram.vertexPosition);
+
     this.setDepthSublayer(0);
     this.depthMask(false);
     gl.disable(gl.DEPTH_TEST);

@@ -266,3 +266,16 @@
         display:none;
     }
 }
+
+.slv-map-tooltip {
+    display: none;
+    position: absolute;
+    z-index: 2;
+    background-color: #fff;
+    padding: 5px;
+    border-radius: 5px;
+    border-bottom-left-radius: 0px;
+    border: 1px solid #000;
+    pointer-events: none;
+}
+
