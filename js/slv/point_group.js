@@ -19,6 +19,13 @@ PointGroup.prototype.setNeedsRefresh = function () {
     this.needsRefresh = true;
 };
 
+PointGroup.prototype.updateMarkerSprite = function (index, sprite) {
+    if (index > 0 && index < this.markers.length) {
+        this.markers[index].sprite = sprite;
+        this.needsRefresh = true;
+    }
+};
+
 PointGroup.prototype.refreshIfNeeded = function () {
     if (this.needsRefresh === true && this.buffer) {
         this.buffer.bind();

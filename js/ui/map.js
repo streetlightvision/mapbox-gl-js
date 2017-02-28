@@ -252,6 +252,12 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
         return changed;
     },
 
+    updateMarkerSprite: function(marker, sprite) {
+        var quadrant = this.findQuadrant(marker);
+        quadrant.updateMarkerSprite(marker, sprite);
+        return quadrant;
+    },
+
     addDynamicMarker: function(marker) {
         var qc = this.findQuadrantCoords(marker);
         var quadrant = this.dynamicQuadrant[qc.row][qc.col];

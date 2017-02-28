@@ -56,6 +56,17 @@ Quadrant.prototype.removeMarker = function (marker) {
     return false;
 };
 
+Quadrant.prototype.updateMarkerSprite = function (marker, sprite) {
+    for (var i = 0; i < this.staticGroups.length; i++) {
+        var found = this.staticGroups[i].findMarker(marker);
+        if (found >= 0) {
+            this.staticGroups[i].updateMarkerSprite(found, sprite);
+            return true;
+        }
+    }
+    return false;
+};
+
 Quadrant.prototype.buildBuffers = function() {
     if (this.staticGroups[this.currentStaticGroup].markers.length > 0) {
         this.staticGroups[this.currentStaticGroup].buildBuffer();
