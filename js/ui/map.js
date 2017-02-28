@@ -909,6 +909,24 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
     },
 
     /**
+     * Adds a [Mapbox style layer] at position (https://www.mapbox.com/mapbox-gl-style-spec/#layers)
+     * to the map's style.
+     *
+     * A layer defines styling for data from a specified source.
+     *
+     * @param {Object} layer The style layer to add, conforming to the Mapbox Style Specification's
+     *   [layer definition](https://www.mapbox.com/mapbox-gl-style-spec/#layers).
+     * @param {int} [position] The position of the new layer.
+     *   If this argument is omitted, the layer will be appended to the end of the layers array.
+     * @fires layer.add
+     * @returns {Map} `this`
+     */
+    addLayerAt: function(layer, position) {
+        if (position && this.style._layers.length > position) return this.addLayer(layer, this.style._layers[position].id);
+        else return this.addLayer(layer);
+    },
+
+    /**
      * Removes a layer from the map's style.
      *
      * Also removes any layers which refer to the specified layer via a
