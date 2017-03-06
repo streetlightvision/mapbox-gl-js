@@ -14,9 +14,13 @@ function CustomBuffer(gl, transform, painter, markers, quadrant) {
     this.buffers = {
         vertex : {
             buffer : gl.createBuffer(),
-            itemSize : 2
+            itemSize : 3
         },
         texture : {
+            buffer : gl.createBuffer(),
+            itemSize : 2
+        },
+        offset : {
             buffer : gl.createBuffer(),
             itemSize : 2
         },
@@ -34,6 +38,7 @@ util.extend(CustomBuffer.prototype, {
         var gl = this.gl;
         var markers = this.markers;
         var statsVertices = [];
+        var statsOffset = [];
         var statsTexture = [];
         var statsIndices = [];
 
@@ -44,30 +49,49 @@ util.extend(CustomBuffer.prototype, {
 
         var index = 0;
 
-        var scale = 14;
-
         var quadX = quadrantIncement.x * this.quadrant.col;
         var quadY = quadrantIncement.y * this.quadrant.row;
 
         this.tX = this.lngX(quadX - 180);
         this.tY = this.latY(90 - quadY);
 
-        var deltaX = 0.00001291749338624338 * scale;
-        var deltaY = 0.00001291749339316084 * scale;
+        var z = 0;
 
         for (var i = 0; i < markers.length; i++) {
             if (markers[i] === undefined) continue;
 
+            if (markers[i].sprite.includes('error') || markers[i].sprite.includes('warning')) {
+                z = 0.0001;
+            } else {
+                z = 0;
+            }
+
             var x = this.lngX(markers[i].lng);
             var y = this.latY(markers[i].lat);
-            statsVertices.push(x - this.tX - deltaX);
-            statsVertices.push(y - this.tY + deltaY);
-            statsVertices.push(x - this.tX + deltaX);
-            statsVertices.push(y - this.tY + deltaY);
-            statsVertices.push(x - this.tX + deltaX);
-            statsVertices.push(y - this.tY - deltaY);
-            statsVertices.push(x - this.tX - deltaX);
-            statsVertices.push(y - this.tY - deltaY);
+
+            statsVertices.push(x - this.tX);
+            statsVertices.push(y - this.tY);
+            statsVertices.push(z);
+            statsOffset.push(-1);
+            statsOffset.push(1);
+
+            statsVertices.push(x - this.tX);
+            statsVertices.push(y - this.tY);
+            statsVertices.push(z);
+            statsOffset.push(1);
+            statsOffset.push(1);
+
+            statsVertices.push(x - this.tX);
+            statsVertices.push(y - this.tY);
+            statsVertices.push(z);
+            statsOffset.push(1);
+            statsOffset.push(-1);
+
+            statsVertices.push(x - this.tX);
+            statsVertices.push(y - this.tY);
+            statsVertices.push(z);
+            statsOffset.push(-1);
+            statsOffset.push(-1);
 
             this.pushTexCoords(markers[i], statsTexture);
 
@@ -84,6 +108,9 @@ util.extend(CustomBuffer.prototype, {
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.vertex.buffer);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(statsVertices), gl.STATIC_DRAW);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.offset.buffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(statsOffset), gl.STATIC_DRAW);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.texture.buffer);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(statsTexture), gl.STATIC_DRAW);
@@ -133,6 +160,7 @@ util.extend(CustomBuffer.prototype, {
     clear: function() {
         var gl = this.gl;
         gl.deleteBuffer(this.buffers.vertex.buffer);
+        gl.deleteBuffer(this.buffers.offset.buffer);
         gl.deleteBuffer(this.buffers.texture.buffer);
         gl.deleteBuffer(this.buffers.indices.buffer);
     },

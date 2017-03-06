@@ -226,14 +226,18 @@ Painter.prototype.compileCustomProgram = function() {
 
     gl.useProgram(this.customProgram);
 
-    this.customProgram.texCoords = gl.getAttribLocation(this.customProgram, 'tex_coords');
-    gl.enableVertexAttribArray(this.customProgram.texCoords);
-
     this.customProgram.vertexPosition = gl.getAttribLocation(this.customProgram, 'position');
     gl.enableVertexAttribArray(this.customProgram.vertexPosition);
 
+    this.customProgram.vertexOffset = gl.getAttribLocation(this.customProgram, 'offset');
+    gl.enableVertexAttribArray(this.customProgram.offsetPosition);
+
+    this.customProgram.texCoords = gl.getAttribLocation(this.customProgram, 'tex_coords');
+    gl.enableVertexAttribArray(this.customProgram.texCoords);
+
     this.cacheUniformLocation(program, 'u_sampler');
     this.cacheUniformLocation(program, 'u_texsize');
+    this.cacheUniformLocation(program, 'u_zoom');
     this.cacheUniformLocation(program, 'u_mvp_matrix');
 };
 
@@ -267,12 +271,9 @@ Painter.prototype.cacheUniformLocation = function(program, label)  {
 
 
 Painter.prototype.renderCustomBuffers = function(buffers) {
-    if (this.transform.zoom < 11.0) return;
+    if (this.transform.zoom < 5.0) return;
 
     var gl = this.gl;
-
-    gl.enableVertexAttribArray(this.customProgram.texCoords);
-    gl.enableVertexAttribArray(this.customProgram.vertexPosition);
 
     this.setDepthSublayer(0);
     this.depthMask(false);
@@ -284,6 +285,12 @@ Painter.prototype.renderCustomBuffers = function(buffers) {
 
     gl.activeTexture(gl.TEXTURE0);
     gl.uniform1i(this.customProgram.uniformsCache['u_sampler'], 0);
+    var zoom = 0.014022196716; // zoom at level 12
+    if (this.transform.zoom > 12) {
+        zoom = 200 * Math.pow(2, -this.transform.zoom * 1.15);
+    }
+
+    gl.uniform1f(this.customProgram.uniformsCache['u_zoom'], zoom);
     gl.uniform2f(this.customProgram.uniformsCache['u_texsize'], this.spriteAtlas.width / 4, this.spriteAtlas.height / 4);
     this.spriteAtlas.bind(gl, true);
 
@@ -291,6 +298,12 @@ Painter.prototype.renderCustomBuffers = function(buffers) {
     var posMatrix = new Float64Array(16);
 
     for (var i = 0; i < buffers.length; i++) {
+        if (i === 0) {
+            gl.enableVertexAttribArray(this.customProgram.vertexPosition);
+            gl.enableVertexAttribArray(this.customProgram.vertexOffset);
+            gl.enableVertexAttribArray(this.customProgram.texCoords);
+        }
+
         if (buffers[i].isEmpty() === true) continue;
         mat4.identity(posMatrix);
         mat4.translate(posMatrix, posMatrix, [buffers[i].tX * scale, buffers[i].tY * scale, 0]);
@@ -303,6 +316,10 @@ Painter.prototype.renderCustomBuffers = function(buffers) {
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers[i].buffers.vertex.buffer);
         gl.vertexAttribPointer(this.customProgram.vertexPosition, buffers[i].buffers.vertex.itemSize, gl.FLOAT, gl.FALSE, 0, 0);
 
+        // attach offset buffer
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffers[i].buffers.offset.buffer);
+        gl.vertexAttribPointer(this.customProgram.vertexOffset, buffers[i].buffers.offset.itemSize, gl.FLOAT, gl.FALSE, 0, 0);
+
         // attach texture buffer
         gl.bindBuffer(gl.ARRAY_BUFFER, buffers[i].buffers.texture.buffer);
         gl.vertexAttribPointer(this.customProgram.texCoords, buffers[i].buffers.texture.itemSize, gl.FLOAT, false, 0, 0);
@@ -312,6 +329,8 @@ Painter.prototype.renderCustomBuffers = function(buffers) {
 
         gl.drawElements(gl.TRIANGLES, buffers[i].indicesLength, gl.UNSIGNED_SHORT, 0);
     }
+
+    gl.disableVertexAttribArray(this.customProgram.vertexOffset);
 };
 
 Painter.prototype.render = function(style, options) {

@@ -54,13 +54,17 @@ var gcPath = 'http://localhost/groundcontrol/';
 var plugin;
 
 var options = {
-    hasView: false,
     autoStart : false,
     service : {
         protocol: 'https:',
         host: 'beast.gbuzogany.com',
         port: '443',
         path: 'reports/'
+
+        // protocol: 'http:',
+        // host: 'ns374474.ip-5-196-91.eu',
+        // port: '8080',
+        // path: 'reports/'
     },
     path: gcPath
 };
@@ -69,8 +73,8 @@ loadDependencies();
 
 var map = window.map = new mapboxgl.Map({
     container: 'map',
-    zoom: 16,
-    center: [2.3222, 48.8736],
+    zoom: 12,
+    center: [174.7633, -36.8485],
     style: {
         "version": 8,
         "sources": {

@@ -361,7 +361,7 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
         this.style['get icons'](0, {
             icons: icons
         }, function() {
-            console.log('added icons to sprite map');
+
         });
     },
 
@@ -1149,6 +1149,8 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
 
         var gl = this._canvas.getContext('webgl', attributes) ||
             this._canvas.getContext('experimental-webgl', attributes);
+
+        gl.disable(gl.CULL_FACE);
 
         if (!gl) {
             this.fire('error', { error: new Error('Failed to initialize WebGL') });

@@ -152,7 +152,7 @@ SpriteAtlas.prototype.copy = function(dst, src, wrap) {
 
 SpriteAtlas.prototype.setSprite = function(sprite) {
     if (sprite) {
-        this.pixelRatio = browser.devicePixelRatio > 1 ? 2 : 1;
+        this.pixelRatio = 2;
 
         if (this.canvas) {
             this.canvas.width = this.width * this.pixelRatio;
@@ -184,11 +184,10 @@ SpriteAtlas.prototype.bind = function(gl, linear) {
 
     var filterVal = linear ? gl.LINEAR : gl.NEAREST;
     if (filterVal !== this.filter) {
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filterVal);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filterVal);
         this.filter = filterVal;
     }
-
     if (this.dirty) {
         this.allocate();
 
@@ -217,6 +216,7 @@ SpriteAtlas.prototype.bind = function(gl, linear) {
                 new Uint8Array(this.data.buffer) // Object pixels
             );
         }
+        gl.generateMipmap(gl.TEXTURE_2D);
 
         this.dirty = false;
     }
