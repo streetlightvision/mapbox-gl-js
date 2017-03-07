@@ -43,7 +43,7 @@ PointGroup.prototype.addMarker = function (marker) {
 };
 
 PointGroup.prototype.selectMarker = function (marker) {
-    if (this.markers[marker.index].sprite.endsWith('-selected') === false) {
+    if (this.stringEndsWith(this.markers[marker.index].sprite, '-selected') === false) {
         this.markers[marker.index].sprite += '-selected';
         this.needsRefresh = true;
         return true;
@@ -51,8 +51,12 @@ PointGroup.prototype.selectMarker = function (marker) {
     return false;
 };
 
+PointGroup.prototype.stringEndsWith = function(text, suffix) {
+    return text.indexOf(suffix, text.length - suffix.length) !== -1;
+};
+
 PointGroup.prototype.unselectMarker = function (marker) {
-    if (this.markers[marker.index].sprite.endsWith('-selected') === true) {
+    if (this.stringEndsWith(this.markers[marker.index].sprite, '-selected') === true) {
         this.markers[marker.index].sprite = this.markers[marker.index].sprite.substring(0, this.markers[marker.index].sprite.length - 9);
         this.needsRefresh = true;
         return true;

@@ -229,16 +229,19 @@ Painter.prototype.compileCustomProgram = function() {
     this.customProgram.vertexPosition = gl.getAttribLocation(this.customProgram, 'position');
     gl.enableVertexAttribArray(this.customProgram.vertexPosition);
 
+    this.customProgram.texCoords = gl.getAttribLocation(this.customProgram, 'tex_coords');
+    gl.enableVertexAttribArray(this.customProgram.texCoords);
+
     this.customProgram.vertexOffset = gl.getAttribLocation(this.customProgram, 'offset');
     gl.enableVertexAttribArray(this.customProgram.offsetPosition);
 
-    this.customProgram.texCoords = gl.getAttribLocation(this.customProgram, 'tex_coords');
-    gl.enableVertexAttribArray(this.customProgram.texCoords);
 
     this.cacheUniformLocation(program, 'u_sampler');
     this.cacheUniformLocation(program, 'u_texsize');
     this.cacheUniformLocation(program, 'u_zoom');
     this.cacheUniformLocation(program, 'u_mvp_matrix');
+
+    gl.disableVertexAttribArray(this.customProgram.vertexOffset);
 };
 
 Painter.prototype.createShader = function(src, type) {
@@ -300,8 +303,8 @@ Painter.prototype.renderCustomBuffers = function(buffers) {
     for (var i = 0; i < buffers.length; i++) {
         if (i === 0) {
             gl.enableVertexAttribArray(this.customProgram.vertexPosition);
-            gl.enableVertexAttribArray(this.customProgram.vertexOffset);
             gl.enableVertexAttribArray(this.customProgram.texCoords);
+            gl.enableVertexAttribArray(this.customProgram.vertexOffset);
         }
 
         if (buffers[i].isEmpty() === true) continue;
@@ -329,7 +332,6 @@ Painter.prototype.renderCustomBuffers = function(buffers) {
 
         gl.drawElements(gl.TRIANGLES, buffers[i].indicesLength, gl.UNSIGNED_SHORT, 0);
     }
-
     gl.disableVertexAttribArray(this.customProgram.vertexOffset);
 };
 

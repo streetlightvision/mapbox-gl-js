@@ -60,7 +60,7 @@ util.extend(CustomBuffer.prototype, {
         for (var i = 0; i < markers.length; i++) {
             if (markers[i] === undefined) continue;
 
-            if (markers[i].sprite.includes('error') || markers[i].sprite.includes('warning')) {
+            if (markers[i].sprite.indexOf('error') >= 0 || markers[i].sprite.indexOf('warning') >= 0) {
                 z = 0.0001;
             } else {
                 z = 0;
