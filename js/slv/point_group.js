@@ -5,24 +5,27 @@ module.exports = PointGroup;
 function PointGroup(customBufferManager, quadrant) {
     this.index = 0;
     this.markers = [];
+    this.markersMap = {};
     this.quadrant = quadrant;
     this.customBufferManager = customBufferManager;
     this.needsRefresh = false;
+    this.needsSpriteRefresh = false;
 }
 
 PointGroup.prototype.buildBuffer = function () {
     this.buffer = this.customBufferManager.createStaticBufferWithMarkers(this.markers, this.quadrant);
     this.needsRefresh = false;
+    this.needsSpriteRefresh = false;
 };
 
 PointGroup.prototype.setNeedsRefresh = function () {
     this.needsRefresh = true;
 };
 
-PointGroup.prototype.updateMarkerSprite = function (index, sprite) {
-    if (index > 0 && index < this.markers.length) {
-        this.markers[index].sprite = sprite;
-        this.needsRefresh = true;
+PointGroup.prototype.updateMarkerSprite = function (marker, sprite) {
+    if (marker.id in this.markersMap) {
+        this.markers[marker.index].sprite = sprite;
+        this.needsSpriteRefresh = true;
     }
 };
 
@@ -31,6 +34,8 @@ PointGroup.prototype.refreshIfNeeded = function () {
         this.buffer.bind();
         this.needsRefresh = false;
         return true;
+    } else if (this.needsSpriteRefresh === true && this.buffer) {
+        return this.rebuildSprites();
     } else {
         return false;
     }
@@ -39,13 +44,14 @@ PointGroup.prototype.refreshIfNeeded = function () {
 PointGroup.prototype.addMarker = function (marker) {
     marker.index = this.index++;
     this.markers.push(marker);
+    this.markersMap[marker.id] = true;
     this.needsRefresh = true;
 };
 
 PointGroup.prototype.selectMarker = function (marker) {
     if (this.stringEndsWith(this.markers[marker.index].sprite, '-selected') === false) {
         this.markers[marker.index].sprite += '-selected';
-        this.needsRefresh = true;
+        this.needsSpriteRefresh = true;
         return true;
     }
     return false;
@@ -58,7 +64,7 @@ PointGroup.prototype.stringEndsWith = function(text, suffix) {
 PointGroup.prototype.unselectMarker = function (marker) {
     if (this.stringEndsWith(this.markers[marker.index].sprite, '-selected') === true) {
         this.markers[marker.index].sprite = this.markers[marker.index].sprite.substring(0, this.markers[marker.index].sprite.length - 9);
-        this.needsRefresh = true;
+        this.needsSpriteRefresh = true;
         return true;
     }
     return false;
@@ -80,25 +86,32 @@ PointGroup.prototype.rebuild = function () {
     }
 };
 
-PointGroup.prototype.findMarker = function (marker) {
-    for (var i = 0; i < this.markers.length; i++) {
-        if (this.markers[i] !== undefined && this.markers[i].id === marker.id) {
-            return i;
-        }
+PointGroup.prototype.rebuildSprites = function () {
+    if (this.needsSpriteRefresh === true && this.buffer !== undefined) {
+        this.buffer.buildTextureBuffer();
+        this.needsSpriteRefresh = false;
+        return true;
     }
-    return -1;
+    return false;
+};
+
+PointGroup.prototype.findMarker = function (marker) {
+    if (marker.id in this.markersMap) {
+        return true;
+    } else {
+        return false;
+    }
 };
 
 PointGroup.prototype.removeMarker = function (marker) {
-    var index = this.findMarker(marker);
-    if (index >= 0) {
-        this.removeMarkerFromIndex(index);
-    }
-};
-
-PointGroup.prototype.removeMarkerFromIndex = function (index) {
-    if (index >= 0) {
-        delete this.markers[index];
+    if (marker.id in this.markersMap) {
+        delete this.markersMap[marker.id];
+        if(this.markers[marker.index].id == marker.id) {
+            delete this.markers[marker.index];
+            delete marker.index;
+        } else {
+            console.warn('marker index inconsistent!');
+        }
         this.needsRefresh = true;
         this.rebuild();
     }

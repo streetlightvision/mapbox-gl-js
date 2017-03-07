@@ -39,7 +39,6 @@ util.extend(CustomBuffer.prototype, {
         var markers = this.markers;
         var statsVertices = [];
         var statsOffset = [];
-        var statsTexture = [];
         var statsIndices = [];
 
         var quadrantIncement = {
@@ -93,8 +92,6 @@ util.extend(CustomBuffer.prototype, {
             statsOffset.push(-1);
             statsOffset.push(-1);
 
-            this.pushTexCoords(markers[i], statsTexture);
-
             statsIndices.push(index);
             statsIndices.push(index + 1);
             statsIndices.push(index + 3);
@@ -112,12 +109,10 @@ util.extend(CustomBuffer.prototype, {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.offset.buffer);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(statsOffset), gl.STATIC_DRAW);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.texture.buffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(statsTexture), gl.STATIC_DRAW);
-
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffers.indices.buffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(statsIndices), gl.STATIC_DRAW);
 
+        this.buildTextureBuffer();
     },
     pushTexCoords: function(marker, statsTexture) {
         var addDefault = false;
@@ -149,6 +144,19 @@ util.extend(CustomBuffer.prototype, {
             statsTexture.push(0);
             statsTexture.push(0);
         }
+    },
+    buildTextureBuffer: function() {
+        var statsTexture = [];
+        var markers = this.markers;
+        var gl = this.gl;
+
+        for (var i = 0; i < markers.length; i++) {
+            if (markers[i] === undefined) continue;
+            this.pushTexCoords(markers[i], statsTexture);
+        }
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.texture.buffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(statsTexture), gl.STATIC_DRAW);
     },
     lngX: function(lng) {
         return ((180 + lng) * 512 / 360);

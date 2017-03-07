@@ -24,6 +24,7 @@ var Attribution = require('./control/attribution');
 var isSupported = require('mapbox-gl-supported');
 
 var Quadrant = require('../slv/quadrant');
+var QuadrantFactory = require('../slv/quadrant_factory');
 
 var defaultMinZoom = 0;
 var defaultMaxZoom = 20;
@@ -222,6 +223,8 @@ var Map = module.exports = function(options) {
         y: 180 / this.latDivisions
     };
 
+    this.quadrantFactory = new QuadrantFactory(this, this.lngDivisions, this.latDivisions);
+
     this.quadrant = [];
     this.dynamicQuadrant = [];
 
@@ -229,8 +232,8 @@ var Map = module.exports = function(options) {
         this.quadrant[i] = [];
         this.dynamicQuadrant[i] = [];
         for (var j = 0; j < this.lngDivisions; j++) {
-            this.quadrant[i][j] = new Quadrant(i, j, this, this.lngDivisions, this.latDivisions);
-            this.dynamicQuadrant[i][j] = new Quadrant(i, j, this, this.lngDivisions, this.latDivisions);
+            this.quadrant[i][j] = this.quadrantFactory.createQuadrant(i, j);
+            this.dynamicQuadrant[i][j] = this.quadrantFactory.createQuadrant(i, j);
         }
     }
 };
@@ -245,15 +248,29 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
 
     // marker must have lng, lat & id to be able to find out which buffer it is in
     removeMarker: function(marker, render) {
-        var changed = this.findQuadrant(marker).removeMarker(marker);
+        var quadrant = undefined;
+        if (marker.quadrant >= 0) {
+            quadrant = this.quadrantFactory.getQuadrant(marker.quadrant);
+        }
+        else {
+            quadrant = this.findQuadrant(marker);
+        }
+        var changed = quadrant.removeMarker(marker);
         if (changed && render) {
+            marker.quadrant = undefined;
             this._render();
         }
         return changed;
     },
 
     updateMarkerSprite: function(marker, sprite) {
-        var quadrant = this.findQuadrant(marker);
+        var quadrant = undefined;
+        if (marker.quadrant >= 0) {
+            quadrant = this.quadrantFactory.getQuadrant(marker.quadrant);
+        }
+        else {
+            quadrant = this.findQuadrant(marker);
+        }
         quadrant.updateMarkerSprite(marker, sprite);
         return quadrant;
     },
@@ -277,9 +294,12 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
     },
 
     findQuadrant: function(marker) {
-        var qc = this.findQuadrantCoords(marker);
-
-        return this.quadrant[qc.row][qc.col];
+        if (marker.quadrant >= 0) {
+            return this.quadrantFactory.getQuadrant(marker.quadrant);
+        } else {
+            var qc = this.findQuadrantCoords(marker);
+            return this.quadrant[qc.row][qc.col];
+        }
     },
 
     findQuadrantCoords: function(marker) {
@@ -306,7 +326,12 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
         }
 
         for (var i = 0; i < markers.length; i++) {
-            this.findQuadrant(markers[i]).selectMarker(markers[i]);
+            if (markers[i].quadrant > 0) {
+                this.quadrantFactory.getQuadrant(markers[i].quadrant).selectMarker(markers[i]);
+            }
+            else {
+                this.findQuadrant(markers[i]).selectMarker(markers[i]);
+            }
         }
 
         for (var i = 0; i < this.latDivisions; i++) {
@@ -324,14 +349,25 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
 
     setSelection: function(markers) {
         for (var i = 0; i < this.selectedMarkers.length; i++) {
-            this.findQuadrant(this.selectedMarkers[i]).unselectMarker(this.selectedMarkers[i]);
+            if (this.selectedMarkers[i].quadrant >= 0) {
+                this.quadrantFactory.getQuadrant(this.selectedMarkers[i].quadrant).unselectMarker(this.selectedMarkers[i]);
+            }
+            else {
+                this.findQuadrant(this.selectedMarkers[i]).unselectMarker(this.selectedMarkers[i]);
+            }
         }
 
         // creates a clone
         this.selectedMarkers = markers.slice();
 
         for (var i = 0; i < markers.length; i++) {
-            this.findQuadrant(markers[i]).selectMarker(markers[i]);
+            if (markers[i].quadrant >= 0) {
+                this.quadrantFactory.getQuadrant(markers[i].quadrant).selectMarker(markers[i]);
+            }
+            else
+            {
+                this.findQuadrant(markers[i]).selectMarker(markers[i]);
+            }
         }
         var shouldRender = false;
 
@@ -378,6 +414,15 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
         for (var i = 0; i < this.latDivisions; i++) {
             for (var j = 0; j < this.lngDivisions; j++) {
                 this.quadrant[i][j].rebuild();
+            }
+        }
+        this._render();
+    },
+
+    rebuildSprites: function() {
+        for (var i = 0; i < this.latDivisions; i++) {
+            for (var j = 0; j < this.lngDivisions; j++) {
+                this.quadrant[i][j].rebuildSprites();
             }
         }
         this._render();

@@ -4,7 +4,8 @@ module.exports = Quadrant;
 
 var PointGroup = require('../slv/point_group');
 
-function Quadrant(row, col, map, lngDivisions, latDivisions) {
+function Quadrant(id, row, col, map, lngDivisions, latDivisions) {
+    this.id = id;
     this.row = row;
     this.col = col;
     this.markersPerQuadrant = 16383;
@@ -42,14 +43,15 @@ Quadrant.prototype.addMarker = function (marker) {
     }
 
     marker.groupIndex = this.currentStaticGroup;
+    marker.quadrant = this.id;
     this.staticGroups[this.currentStaticGroup].addMarker(marker);
 };
 
 Quadrant.prototype.removeMarker = function (marker) {
     for (var i = 0; i < this.staticGroups.length; i++) {
-        var found = this.staticGroups[i].findMarker(marker);
-        if (found >= 0) {
-            this.staticGroups[i].removeMarkerFromIndex(found);
+        if (this.staticGroups[i].findMarker(marker) == true) {
+            if (marker.quadrant) delete marker.quadrant;
+            this.staticGroups[i].removeMarker(marker);
             return true;
         }
     }
@@ -58,9 +60,8 @@ Quadrant.prototype.removeMarker = function (marker) {
 
 Quadrant.prototype.updateMarkerSprite = function (marker, sprite) {
     for (var i = 0; i < this.staticGroups.length; i++) {
-        var found = this.staticGroups[i].findMarker(marker);
-        if (found >= 0) {
-            this.staticGroups[i].updateMarkerSprite(found, sprite);
+        if (this.staticGroups[i].findMarker(marker) === true) {
+            this.staticGroups[i].updateMarkerSprite(marker, sprite);
             return true;
         }
     }
@@ -126,3 +127,11 @@ Quadrant.prototype.rebuild = function() {
     }
     this.needsRefresh = true;
 };
+
+Quadrant.prototype.rebuildSprites = function() {
+    for (var i = 0; i < this.staticGroups.length; i++) {
+        this.staticGroups[i].rebuildSprites();
+    }
+    this.needsRefresh = true;
+};
+
