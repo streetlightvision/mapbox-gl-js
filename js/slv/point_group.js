@@ -30,12 +30,12 @@ PointGroup.prototype.updateMarkerSprite = function (marker, sprite) {
 };
 
 PointGroup.prototype.refreshIfNeeded = function () {
-    if (this.needsRefresh === true && this.buffer) {
+    if (this.needsSpriteRefresh === true && this.buffer) {
+        return this.rebuildSprites();
+    } else if (this.needsRefresh === true && this.buffer) {
         this.buffer.bind();
         this.needsRefresh = false;
         return true;
-    } else if (this.needsSpriteRefresh === true && this.buffer) {
-        return this.rebuildSprites();
     } else {
         return false;
     }

@@ -132,6 +132,5 @@ Quadrant.prototype.rebuildSprites = function() {
     for (var i = 0; i < this.staticGroups.length; i++) {
         this.staticGroups[i].rebuildSprites();
     }
-    this.needsRefresh = true;
 };
 

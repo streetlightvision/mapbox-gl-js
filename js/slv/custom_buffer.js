@@ -114,49 +114,47 @@ util.extend(CustomBuffer.prototype, {
 
         this.buildTextureBuffer();
     },
-    pushTexCoords: function(marker, statsTexture) {
-        var addDefault = false;
-        if (this.painter.spriteAtlas.sprite !== undefined) {
-            var sprites = this.painter.spriteAtlas.images;
-            if (marker.sprite in sprites) {
-                var sprite = sprites[marker.sprite];
-                statsTexture.push((sprite.rect.x) / 4);
-                statsTexture.push((sprite.rect.y + sprite.rect.height) / 4);
-                statsTexture.push((sprite.rect.x + sprite.rect.width) / 4);
-                statsTexture.push((sprite.rect.y + sprite.rect.height) / 4);
-                statsTexture.push((sprite.rect.x + sprite.rect.width) / 4);
-                statsTexture.push((sprite.rect.y) / 4);
-                statsTexture.push(sprite.rect.x / 4);
-                statsTexture.push(sprite.rect.y / 4);
-            } else {
-                console.warn(marker.sprite + ' not found.');
-                addDefault = true;
-            }
-        }
-        if (addDefault === true) {
-            console.warn('Marker doesn\'t have a sprite on the current sprite map!', marker);
-            statsTexture.push(0);
-            statsTexture.push(0);
-            statsTexture.push(0);
-            statsTexture.push(0);
-            statsTexture.push(0);
-            statsTexture.push(0);
-            statsTexture.push(0);
-            statsTexture.push(0);
-        }
-    },
     buildTextureBuffer: function() {
-        var statsTexture = [];
+        var buffer = new Float32Array(this.markers.length*4*2);
         var markers = this.markers;
         var gl = this.gl;
+        var index = 0;
 
         for (var i = 0; i < markers.length; i++) {
             if (markers[i] === undefined) continue;
-            this.pushTexCoords(markers[i], statsTexture);
+            var addDefault = false;
+            if (this.painter.spriteAtlas.sprite !== undefined) {
+                var sprites = this.painter.spriteAtlas.images;
+                if (markers[i].sprite in sprites) {
+                    var sprite = sprites[markers[i].sprite];
+                    buffer[index++] = (sprite.rect.x) / 4;
+                    buffer[index++] = (sprite.rect.y + sprite.rect.height) / 4;
+                    buffer[index++] = (sprite.rect.x + sprite.rect.width) / 4;
+                    buffer[index++] = (sprite.rect.y + sprite.rect.height) / 4;
+                    buffer[index++] = (sprite.rect.x + sprite.rect.width) / 4;
+                    buffer[index++] = (sprite.rect.y) / 4;
+                    buffer[index++] = sprite.rect.x / 4;
+                    buffer[index++] = sprite.rect.y / 4;
+                } else {
+                    console.warn(markers[i].sprite + ' not found.');
+                    addDefault = true;
+                }
+            }
+            if (addDefault === true) {
+                console.warn('Marker doesn\'t have a sprite on the current sprite map!', markers[i]);
+                buffer[index++] = 0;
+                buffer[index++] = 0;
+                buffer[index++] = 0;
+                buffer[index++] = 0;
+                buffer[index++] = 0;
+                buffer[index++] = 0;
+                buffer[index++] = 0;
+                buffer[index++] = 0;
+            }
         }
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.texture.buffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(statsTexture), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, buffer, gl.STATIC_DRAW);
     },
     lngX: function(lng) {
         return ((180 + lng) * 512 / 360);
