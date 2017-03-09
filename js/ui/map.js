@@ -427,6 +427,14 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
         }
         this._render();
     },
+    rebuildDepthSprites: function() {
+        for (var i = 0; i < this.latDivisions; i++) {
+            for (var j = 0; j < this.lngDivisions; j++) {
+                this.quadrant[i][j].rebuildDepthSprites();
+            }
+        }
+        this._render();
+    },
 
     /**
      * Adds a [`Control`](#Control) to the map, calling `control.addTo(this)`.

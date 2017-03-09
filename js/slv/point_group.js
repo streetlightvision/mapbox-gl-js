@@ -80,7 +80,7 @@ PointGroup.prototype.clear = function () {
 };
 
 PointGroup.prototype.rebuild = function () {
-    if (this.needsRefresh === true) {
+    if (this.needsRefresh === true || this.needsSpriteRefresh === true) {
         this.clear();
         this.buildBuffer();
     }
@@ -88,6 +88,16 @@ PointGroup.prototype.rebuild = function () {
 
 PointGroup.prototype.rebuildSprites = function () {
     if (this.needsSpriteRefresh === true && this.buffer !== undefined) {
+        this.buffer.buildTextureBuffer();
+        this.needsSpriteRefresh = false;
+        return true;
+    }
+    return false;
+};
+
+PointGroup.prototype.rebuildDepthSprites = function () {
+    if (this.needsSpriteRefresh === true && this.buffer !== undefined) {
+        this.buffer.buildZBuffer();
         this.buffer.buildTextureBuffer();
         this.needsSpriteRefresh = false;
         return true;
@@ -106,7 +116,7 @@ PointGroup.prototype.findMarker = function (marker) {
 PointGroup.prototype.removeMarker = function (marker) {
     if (marker.id in this.markersMap) {
         delete this.markersMap[marker.id];
-        if(this.markers[marker.index].id == marker.id) {
+        if (this.markers[marker.index].id === marker.id) {
             delete this.markers[marker.index];
             delete marker.index;
         } else {

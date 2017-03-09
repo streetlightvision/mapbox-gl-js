@@ -134,3 +134,9 @@ Quadrant.prototype.rebuildSprites = function() {
     }
 };
 
+Quadrant.prototype.rebuildDepthSprites = function() {
+    for (var i = 0; i < this.staticGroups.length; i++) {
+        this.staticGroups[i].rebuildDepthSprites();
+    }
+};
+

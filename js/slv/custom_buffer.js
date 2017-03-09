@@ -30,23 +30,31 @@ function CustomBuffer(gl, transform, painter, markers, quadrant) {
         }
     };
 
+    this.vertexBuffer = undefined;
+
     this.bind();
 }
 
 util.extend(CustomBuffer.prototype, {
     bind: function() {
+        this.buildVertexBuffer();
+        this.buildTextureBuffer();
+        this.buildIndexBuffer();
+    },
+    buildVertexBuffer: function() {
         var gl = this.gl;
         var markers = this.markers;
-        var statsVertices = [];
-        var statsOffset = [];
-        var statsIndices = [];
 
         var quadrantIncement = {
             x: 360 / this.quadrant.lngDivisions,
             y: 180 / this.quadrant.latDivisions
         };
 
-        var index = 0;
+        this.vertexBuffer = new Float32Array(markers.length * 4 * 3);
+        var vertexBuffer = this.vertexBuffer;
+        var vertexIndex = 0;
+        var offsetBuffer = new Float32Array(markers.length * 4 * 2);
+        var offsetIndex = 0;
 
         var quadX = quadrantIncement.x * this.quadrant.col;
         var quadY = quadrantIncement.y * this.quadrant.row;
@@ -59,8 +67,8 @@ util.extend(CustomBuffer.prototype, {
         for (var i = 0; i < markers.length; i++) {
             if (markers[i] === undefined) continue;
 
-            if (markers[i].sprite.indexOf('error') >= 0 || markers[i].sprite.indexOf('warning') >= 0) {
-                z = 0.0001;
+            if (markers[i].status && markers[i].status !== 0) {
+                z = 1;
             } else {
                 z = 0;
             }
@@ -68,56 +76,75 @@ util.extend(CustomBuffer.prototype, {
             var x = this.lngX(markers[i].lng);
             var y = this.latY(markers[i].lat);
 
-            statsVertices.push(x - this.tX);
-            statsVertices.push(y - this.tY);
-            statsVertices.push(z);
-            statsOffset.push(-1);
-            statsOffset.push(1);
+            vertexBuffer[vertexIndex++] = x - this.tX;
+            vertexBuffer[vertexIndex++] = y - this.tY;
+            vertexBuffer[vertexIndex++] = z;
+            offsetBuffer[offsetIndex++] = -1;
+            offsetBuffer[offsetIndex++] = 1;
 
-            statsVertices.push(x - this.tX);
-            statsVertices.push(y - this.tY);
-            statsVertices.push(z);
-            statsOffset.push(1);
-            statsOffset.push(1);
+            vertexBuffer[vertexIndex++] = x - this.tX;
+            vertexBuffer[vertexIndex++] = y - this.tY;
+            vertexBuffer[vertexIndex++] = z;
+            offsetBuffer[offsetIndex++] = 1;
+            offsetBuffer[offsetIndex++] = 1;
 
-            statsVertices.push(x - this.tX);
-            statsVertices.push(y - this.tY);
-            statsVertices.push(z);
-            statsOffset.push(1);
-            statsOffset.push(-1);
+            vertexBuffer[vertexIndex++] = x - this.tX;
+            vertexBuffer[vertexIndex++] = y - this.tY;
+            vertexBuffer[vertexIndex++] = z;
+            offsetBuffer[offsetIndex++] = 1;
+            offsetBuffer[offsetIndex++] = -1;
 
-            statsVertices.push(x - this.tX);
-            statsVertices.push(y - this.tY);
-            statsVertices.push(z);
-            statsOffset.push(-1);
-            statsOffset.push(-1);
-
-            statsIndices.push(index);
-            statsIndices.push(index + 1);
-            statsIndices.push(index + 3);
-            statsIndices.push(index + 1);
-            statsIndices.push(index + 2);
-            statsIndices.push(index + 3);
-            index += 4;
+            vertexBuffer[vertexIndex++] = x - this.tX;
+            vertexBuffer[vertexIndex++] = y - this.tY;
+            vertexBuffer[vertexIndex++] = z;
+            offsetBuffer[offsetIndex++] = -1;
+            offsetBuffer[offsetIndex++] = -1;
         }
 
-        this.indicesLength = statsIndices.length;
-
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.vertex.buffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(statsVertices), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, this.vertexBuffer, gl.STATIC_DRAW);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.offset.buffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(statsOffset), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, offsetBuffer, gl.STATIC_DRAW);
 
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffers.indices.buffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(statsIndices), gl.STATIC_DRAW);
+    },
+    buildZBuffer: function() {
+        var gl = this.gl;
+        var markers = this.markers;
 
-        this.buildTextureBuffer();
+        var vertexBuffer = this.vertexBuffer;
+
+        var z = 0;
+        var vertexIndex = 2;
+
+        for (var i = 0; i < markers.length; i++) {
+            if (markers[i] === undefined) continue;
+
+            if (markers[i].status && markers[i].status !== 0) {
+                z = 1;
+            } else {
+                z = 0;
+            }
+
+            vertexBuffer[vertexIndex] = z;
+            vertexIndex += 3;
+            vertexBuffer[vertexIndex] = z;
+            vertexIndex += 3;
+            vertexBuffer[vertexIndex] = z;
+            vertexIndex += 3;
+            vertexBuffer[vertexIndex] = z;
+            vertexIndex += 3;
+        }
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.vertex.buffer);
+        gl.bufferData(gl.ARRAY_BUFFER, vertexBuffer, gl.STATIC_DRAW);
+
     },
     buildTextureBuffer: function() {
-        var buffer = new Float32Array(this.markers.length*4*2);
-        var markers = this.markers;
         var gl = this.gl;
+        var markers = this.markers;
+
+        var buffer = new Float32Array(this.markers.length * 4 * 2);
         var index = 0;
 
         for (var i = 0; i < markers.length; i++) {
@@ -156,12 +183,39 @@ util.extend(CustomBuffer.prototype, {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.texture.buffer);
         gl.bufferData(gl.ARRAY_BUFFER, buffer, gl.STATIC_DRAW);
     },
+    buildIndexBuffer: function() {
+        var gl = this.gl;
+        var markers = this.markers;
+
+        var index = 0;
+
+        var indicesBuffer = new Uint16Array(markers.length * 6);
+        var indicesIndex = 0;
+
+        for (var i = 0; i < markers.length; i++) {
+            if (markers[i] === undefined) continue;
+
+            indicesBuffer[indicesIndex++] = index;
+            indicesBuffer[indicesIndex++] = index + 1;
+            indicesBuffer[indicesIndex++] = index + 3;
+            indicesBuffer[indicesIndex++] = index + 1;
+            indicesBuffer[indicesIndex++] = index + 2;
+            indicesBuffer[indicesIndex++] = index + 3;
+            index += 4;
+        }
+
+        this.indicesLength = markers.length * 6;
+
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffers.indices.buffer);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer, gl.STATIC_DRAW);
+
+    },
     lngX: function(lng) {
-        return ((180 + lng) * 512 / 360);
+        return ((180 + lng) * 1.4222222222);
     },
     latY: function(lat) {
         var y = 180 / Math.PI * Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360));
-        return (180 - y) * 512 / 360;
+        return (180 - y) * 1.4222222222;
     },
     clear: function() {
         var gl = this.gl;

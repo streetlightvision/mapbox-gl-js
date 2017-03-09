@@ -278,9 +278,12 @@ Painter.prototype.renderCustomBuffers = function(buffers) {
 
     var gl = this.gl;
 
+    this.clearDepth();
+
     this.setDepthSublayer(0);
-    this.depthMask(false);
-    gl.disable(gl.DEPTH_TEST);
+    this.depthMask(true);
+    gl.depthFunc(gl.LEQUAL);
+    gl.enable(gl.DEPTH_TEST);
     gl.disable(gl.STENCIL_TEST);
 
     this.currentProgram = this.customProgram;
