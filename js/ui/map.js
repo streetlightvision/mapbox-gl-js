@@ -40,7 +40,8 @@ var defaultOptions = {
     interactive: true,
 
     scrollZoom: true,
-    boxZoom: true,
+    boxZoom: false,
+    drawSelect: true,
     dragRotate: true,
     dragPan: true,
     keyboard: true,
@@ -248,11 +249,10 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
 
     // marker must have lng, lat & id to be able to find out which buffer it is in
     removeMarker: function(marker, render) {
-        var quadrant = undefined;
+        var quadrant;
         if (marker.quadrant >= 0) {
             quadrant = this.quadrantFactory.getQuadrant(marker.quadrant);
-        }
-        else {
+        } else {
             quadrant = this.findQuadrant(marker);
         }
         var changed = quadrant.removeMarker(marker);
@@ -264,11 +264,10 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
     },
 
     updateMarkerSprite: function(marker, sprite) {
-        var quadrant = undefined;
+        var quadrant;
         if (marker.quadrant >= 0) {
             quadrant = this.quadrantFactory.getQuadrant(marker.quadrant);
-        }
-        else {
+        } else {
             quadrant = this.findQuadrant(marker);
         }
         quadrant.updateMarkerSprite(marker, sprite);

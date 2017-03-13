@@ -6,6 +6,7 @@ var Point = require('point-geometry');
 var handlers = {
     scrollZoom: require('./handler/scroll_zoom'),
     boxZoom: require('./handler/box_zoom'),
+    drawSelect: require('./handler/draw_select'),
     dragRotate: require('./handler/drag_rotate'),
     dragPan: require('./handler/drag_pan'),
     keyboard: require('./handler/keyboard'),
