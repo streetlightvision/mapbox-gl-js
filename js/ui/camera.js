@@ -622,7 +622,11 @@ util.extend(Camera.prototype, /** @lends Map.prototype */{
         function tanh(n) { return sinh(n) / cosh(n); }
 
         // r₀: Zoom-out factor during ascent.
-        var r0 = r(0),
+        var rz = r(0);
+        if (rz < -35) {
+            rz = -35;
+        }
+        var r0 = rz,
             /**
              * w(s): Returns the visible span on the ground, measured in pixels with respect to the
              * initial scale.
@@ -671,7 +675,8 @@ util.extend(Camera.prototype, /** @lends Map.prototype */{
             var s = k * S,
                 us = u(s);
 
-            tr.zoom = startZoom + tr.scaleZoom(1 / w(s));
+            var scale = 1 / w(s);
+            tr.zoom = startZoom + tr.scaleZoom(scale);
             tr.center = tr.unproject(from.add(to.sub(from).mult(us)), startWorldSize);
 
             if (this.rotating) {

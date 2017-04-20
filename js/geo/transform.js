@@ -107,6 +107,10 @@ Transform.prototype = {
 
     get zoom() { return this._zoom; },
     set zoom(zoom) {
+        if (isNaN(zoom)) {
+            console.error(zoom);
+            return;
+        }
         var z = Math.min(Math.max(zoom, this.minZoom), this.maxZoom);
         if (this._zoom === z) return;
         this._unmodified = false;

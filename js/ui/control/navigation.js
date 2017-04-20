@@ -6,7 +6,6 @@ var util = require('../../util/util');
 var window = require('../../util/window');
 
 module.exports = Navigation;
-
 /**
  * A `Navigation` control contains zoom buttons and a compass.
  * Extends [`Control`](#Control).
@@ -34,6 +33,14 @@ Navigation.prototype = util.inherit(Control, {
         this._container.addEventListener('contextmenu', this._onContextMenu.bind(this));
 
         this._zoomInButton = this._createButton(className + '-icon ' + className + '-zoom-in', map.zoomIn.bind(map));
+
+        this._zoomSliderContainer = DOM.create('div', className + '-icon ' + className + '-zoom-slider', this._container);
+        this._zoomSlider = document.createElement('input')
+        this._zoomSlider.type = 'range';
+        this._zoomSlider.id = className + '-zoom-slider-vranger';
+        this._zoomSlider.className = className + '-icon ' + className + '-zoom-slider-vranger';
+        this._container.appendChild(this._zoomSlider);
+
         this._zoomOutButton = this._createButton(className + '-icon ' + className + '-zoom-out', map.zoomOut.bind(map));
         this._compass = this._createButton(className + '-icon ' + className + '-compass', map.resetNorth.bind(map));
 

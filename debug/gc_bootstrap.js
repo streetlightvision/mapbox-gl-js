@@ -1,5 +1,7 @@
 'use strict';
 
+var mapboxDebug = true;
+
 function startPlugin() {
     plugin = new SLV.Plugin('slv', true);
 
