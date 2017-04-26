@@ -12,7 +12,7 @@ var Buffer = require('../data/buffer');
 var VertexArrayObject = require('./vertex_array_object');
 var RasterBoundsArray = require('./draw_raster').RasterBoundsArray;
 var createUniformPragmas = require('./create_uniform_pragmas');
-var shaders = require('mapbox-gl-shaders');
+var shaders = require('slv-mapbox-gl-shaders');
 
 module.exports = Painter;
 
@@ -274,7 +274,7 @@ Painter.prototype.cacheUniformLocation = function(program, label)  {
 
 
 Painter.prototype.renderCustomBuffers = function(buffers) {
-    if (this.transform.zoom < 5.0) return;
+    // if (this.transform.zoom < 5.0) return;
 
     var gl = this.gl;
 
