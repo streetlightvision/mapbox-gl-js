@@ -28,6 +28,10 @@ Quadrant.findQuadrant = function (lng, lat, incX, incY) {
     if (lng > 180) { // then make it in [-180:180]
         lng -= 360;
     }
+    else if (lng < -180) {
+        lng += 360;
+    }
+    
     return {
         col: Math.floor((lng + 180) / incX),
         row: Math.floor((90 - lat) / incY)
