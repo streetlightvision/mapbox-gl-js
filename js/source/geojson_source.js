@@ -89,8 +89,7 @@ function GeoJSONSource(id, options, dispatcher) {
             buffer: (options.buffer !== undefined ? options.buffer : 128) * scale,
             tolerance: (options.tolerance !== undefined ? options.tolerance : 0.375) * scale,
             extent: EXTENT,
-            maxZoom: this.maxzoom,
-            debug: true
+            maxZoom: this.maxzoom
         },
         superclusterOptions: {
             maxZoom: Math.min(options.clusterMaxZoom, this.maxzoom - 1) || (this.maxzoom - 1),

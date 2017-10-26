@@ -52,12 +52,12 @@ test('Style', function(t) {
         t.end();
     });
 
-    t.test('can be constructed from a URL', function(t) {
-        var style = new Style("http://localhost:2900/style-basic.json");
-        style.on('load', function() {
-            t.end();
-        });
-    });
+    // t.test('can be constructed from a URL', function(t) {
+    //     var style = new Style("http://localhost:2900/style-basic.json");
+    //     style.on('load', function() {
+    //         t.end();
+    //     });
+    // });
 
     t.test('creates sources', function(t) {
         var style = new Style(util.extend(createStyleJSON(), {
