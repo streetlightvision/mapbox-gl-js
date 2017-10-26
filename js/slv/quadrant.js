@@ -23,6 +23,14 @@ function Quadrant(id, row, col, map, lngDivisions, latDivisions) {
 }
 
 Quadrant.findQuadrant = function (lng, lat, incX, incY) {
+    lng = lng % 360; // first ensure to be in [0:360]
+    if (lng > 180) { // then make it in [-180:180]
+        lng -= 360;
+    }
+    else if (lng < -180) {
+        lng += 360;
+    }
+    
     return {
         col: Math.floor((lng + 180) / incX),
         row: Math.floor((90 - lat) / incY)

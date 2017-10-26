@@ -12,3 +12,5 @@ coverage
 /debug/access-token-generated.js
 /bench/index-generated.js
 .idea/
+/.settings/
+/.project
