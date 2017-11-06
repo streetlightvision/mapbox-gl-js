@@ -80,25 +80,25 @@ util.extend(CustomBuffer.prototype, {
             vertexBuffer[vertexIndex++] = y - this.tY;
             vertexBuffer[vertexIndex++] = z;
             offsetBuffer[offsetIndex++] = -1;
-            offsetBuffer[offsetIndex++] = 1;
+            offsetBuffer[offsetIndex++] = 0;
 
             vertexBuffer[vertexIndex++] = x - this.tX;
             vertexBuffer[vertexIndex++] = y - this.tY;
             vertexBuffer[vertexIndex++] = z;
             offsetBuffer[offsetIndex++] = 1;
-            offsetBuffer[offsetIndex++] = 1;
+            offsetBuffer[offsetIndex++] = 0;
 
             vertexBuffer[vertexIndex++] = x - this.tX;
             vertexBuffer[vertexIndex++] = y - this.tY;
             vertexBuffer[vertexIndex++] = z;
             offsetBuffer[offsetIndex++] = 1;
-            offsetBuffer[offsetIndex++] = -1;
+            offsetBuffer[offsetIndex++] = -2;
 
             vertexBuffer[vertexIndex++] = x - this.tX;
             vertexBuffer[vertexIndex++] = y - this.tY;
             vertexBuffer[vertexIndex++] = z;
             offsetBuffer[offsetIndex++] = -1;
-            offsetBuffer[offsetIndex++] = -1;
+            offsetBuffer[offsetIndex++] = -2;
         }
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.vertex.buffer);

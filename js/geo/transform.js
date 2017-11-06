@@ -9,7 +9,8 @@ var LngLat = require('./lng_lat'),
     EXTENT = require('../data/bucket').EXTENT,
     glmatrix = require('gl-matrix');
 
-var vec4 = glmatrix.vec4,
+var vec2 = glmatrix.vec2,
+    vec4 = glmatrix.vec4,
     mat4 = glmatrix.mat4,
     mat2 = glmatrix.mat2;
 
@@ -374,6 +375,34 @@ Transform.prototype = {
         mat4.multiply(posMatrix, this.projMatrix, posMatrix);
 
         return new Float32Array(posMatrix);
+    },
+
+    projectMatrix: function(tX, tY, scale, projMatrix) {
+        var posMatrix = new Float64Array(16);
+        mat4.identity(posMatrix);
+        mat4.translate(posMatrix, posMatrix, [tX * scale, tY * scale, 0.0]);
+        mat4.scale(posMatrix, posMatrix, [scale, scale, 1.0]);
+        mat4.multiply(posMatrix, projMatrix, posMatrix);
+        return posMatrix;
+    },
+
+    projectVS: function(offsetX, offsetY, zoom, x, y, tX, tY, posMatrix, width, height, altitude) {
+        var scale = 10000.0 * zoom + 8.0;
+        var delta = vec2.fromValues(0.00001291749338624338, 0.00001291749339316084);
+        // var delta = vec2.fromValues(0.00001091749338624338, 0.00001291749339316084);
+        var offsetMarker = vec2.fromValues(offsetX, offsetY);
+        vec2.scale(delta, delta, scale);
+        vec2.multiply(delta, delta, offsetMarker);
+        
+        var position = vec4.fromValues(x - tX, y - tY, 0.0, 1.0);
+        var deltaP = vec4.fromValues(delta[0], delta[1], 0.0, 0.0);
+        vec4.add(position, position, deltaP);
+        vec4.transformMat4(position, position, posMatrix);
+
+        return {
+            x: width/2 + position[0]/altitude*(width/2), 
+            y: height/2 + position[1]/altitude*(-height/2)
+        };
     },
 
     _constrain: function() {
