@@ -28,6 +28,7 @@ VertexArrayObject.prototype.bind = function(gl, program, layoutVertexBuffer, ele
 
     if (!gl.extVertexArrayObject || isFreshBindRequired) {
         this.freshBind(gl, program, layoutVertexBuffer, elementBuffer, vertexBuffer2);
+        this.gl = gl;
     } else {
         gl.extVertexArrayObject.bindVertexArrayOES(this.vao);
     }
@@ -38,7 +39,7 @@ VertexArrayObject.prototype.freshBind = function(gl, program, layoutVertexBuffer
     var numNextAttributes = program.numAttributes;
 
     if (gl.extVertexArrayObject) {
-        if (this.vao) this.destroy(gl);
+        if (this.vao) this.destroy();
         this.vao = gl.extVertexArrayObject.createVertexArrayOES();
         gl.extVertexArrayObject.bindVertexArrayOES(this.vao);
         numPrevAttributes = 0;
@@ -63,10 +64,28 @@ VertexArrayObject.prototype.freshBind = function(gl, program, layoutVertexBuffer
     }
 
     // Enable all attributes for the new program.
-    for (var j = numPrevAttributes; j < numNextAttributes; j++) {
-        gl.enableVertexAttribArray(j);
+    // for (var j = numPrevAttributes; j < numNextAttributes; j++) {
+    //     gl.enableVertexAttribArray(j);
+    // }
+
+    for (var j = 0; j < layoutVertexBuffer.attributes.length; j++) {
+        var member = layoutVertexBuffer.attributes[j];
+        var attribIndex = program.attributes[member.name];
+        if (attribIndex != undefined) {
+            gl.enableVertexAttribArray(attribIndex);
+        }
     }
 
+    if (vertexBuffer2) {
+        for (var j = 0; j < vertexBuffer2.attributes.length; j++) {
+            var member = vertexBuffer2.attributes[j];
+            var attribIndex = program.attributes[member.name];
+            if (attribIndex != undefined) {
+                gl.enableVertexAttribArray(attribIndex);
+            }
+        }
+    }
+    
     layoutVertexBuffer.bind(gl);
     layoutVertexBuffer.setVertexAttribPointers(gl, program);
     if (vertexBuffer2) {
@@ -87,10 +106,9 @@ VertexArrayObject.prototype.unbind = function(gl) {
     }
 };
 
-VertexArrayObject.prototype.destroy = function(gl) {
-    var ext = gl.extVertexArrayObject;
-    if (ext && this.vao) {
-        ext.deleteVertexArrayOES(this.vao);
+VertexArrayObject.prototype.destroy = function() {
+    if (this.vao) {
+        this.gl.extVertexArrayObject.deleteVertexArrayOES(this.vao);
         this.vao = null;
     }
 };
