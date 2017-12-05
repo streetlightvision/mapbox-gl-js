@@ -128,7 +128,10 @@ Transform.prototype = {
         if (center.lat === this._center.lat && center.lng === this._center.lng) return;
         if (center.lng < -180) {
             center.lng += 360;
+        } else if (center.lng > 180) {
+            center.lng -= 360;
         }
+
         this._unmodified = false;
         this._center = center;
         this._calcMatrices();
