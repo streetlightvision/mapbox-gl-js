@@ -126,6 +126,9 @@ Transform.prototype = {
     get center() { return this._center; },
     set center(center) {
         if (center.lat === this._center.lat && center.lng === this._center.lng) return;
+        if (center.lng < -180) {
+            center.lng += 360;
+        }
         this._unmodified = false;
         this._center = center;
         this._calcMatrices();
