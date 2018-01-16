@@ -141,13 +141,13 @@ DrawSelectHandler.prototype = {
 
         if (wasClick === true) {
             var point = this._map.unproject([endPos.x, endPos.y]);
-            this._map.mapControl.deviceManager.queryCoords(point).then(function (result) {
+            this._map.mapControl.queryCoords(point).then(function (result) {
                 if (result.length > 0 && result.length < 500) {
                     for (var i = 0; i < result.length; i++) {
-                        source._map.mapControl.deviceManager.switchSelection(result[i].id);
+                        source._map.mapControl.switchSelection(result[i].id);
                     }
-                    source._map.mapControl.deviceManager.applySelectionList();
-                    source._map.mapControl.deviceManager.triggerSelection();
+                    source._map.mapControl.applySelectionList();
+                    source._map.mapControl.triggerSelection();
                     source._fireEvent('drawselectend', { markers : result});
                 }
             });
@@ -168,17 +168,17 @@ DrawSelectHandler.prototype = {
 
             var boundaries = { minX: minX, maxX: maxX, minY: minY, maxY: maxY };
 
-            this._map.mapControl.deviceManager.queryBoundaries(boundaries).then(function (result) {
+            this._map.mapControl.queryBoundaries(boundaries).then(function (result) {
                 if (result.length > 0 && result.length < 500) {
                     var markers = [];
                     for (var i = 0; i < result.length; i++) {
                         if (source.inside(result[i], coordsList)) {
                             markers.push(result[i]);
-                            source._map.mapControl.deviceManager.addToSelectionList(result[i].id);
+                            source._map.mapControl.addToSelectionList(result[i].id);
                         }
                     }
-                    source._map.mapControl.deviceManager.applySelectionList();
-                    source._map.mapControl.deviceManager.triggerSelection();
+                    source._map.mapControl.applySelectionList();
+                    source._map.mapControl.triggerSelection();
                     source._fireEvent('drawselectend', { markers : markers});
                 }
             });
