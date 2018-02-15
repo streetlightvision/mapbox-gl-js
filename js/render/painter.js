@@ -292,8 +292,11 @@ Painter.prototype.renderCustomBuffers = function(buffers) {
     gl.activeTexture(gl.TEXTURE0);
     gl.uniform1i(this.customProgram.uniformsCache['u_sampler'], 0);
     var zoom = 0.014022196716; // zoom at level 12
-    if (this.transform.zoom > 12) {
+    if (this.transform.zoom > 12 && this.transform.zoom < 19) {
         zoom = 200 * Math.pow(2, -this.transform.zoom * 1.15);
+    }
+    else if(this.transform.zoom >= 19) {
+        zoom = 200 * Math.pow(2, -this.transform.zoom * 1.15) + (-0.0009422136774561074)*((this.transform.zoom-19)*0.25);
     }
 
     gl.uniform1f(this.customProgram.uniformsCache['u_zoom'], zoom);
