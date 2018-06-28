@@ -24,7 +24,7 @@ function Style(stylesheet, animationLoop) {
 
     this.animationLoop = animationLoop || new AnimationLoop();
     this.dispatcher = new Dispatcher(getWorkerPool(), this);
-    this.spriteAtlas = new SpriteAtlas(1024, 1024);
+    this.spriteAtlas = new SpriteAtlas(2048, 2048);
     this.lineAtlas = new LineAtlas(256, 512);
 
     this._layers = {};
