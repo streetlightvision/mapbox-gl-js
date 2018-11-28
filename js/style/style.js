@@ -24,11 +24,11 @@ function Style(stylesheet, animationLoop) {
 
     this.animationLoop = animationLoop || new AnimationLoop();
     this.dispatcher = new Dispatcher(getWorkerPool(), this);
-    this.spriteAtlas = new SpriteAtlas(4096, 4096);
+    this.spriteAtlas = new SpriteAtlas(2048, 2048);
     this.lineAtlas = new LineAtlas(256, 512);
 
     this._layers = {};
-    this._order  = [];
+    this._order = [];
     this._groups = [];
     this.sources = {};
     this.zoomHistory = {};
@@ -42,9 +42,9 @@ function Style(stylesheet, animationLoop) {
 
     this._resetUpdates();
 
-    var stylesheetLoaded = function(err, stylesheet) {
+    var stylesheetLoaded = function (err, stylesheet) {
         if (err) {
-            this.fire('error', {error: err});
+            this.fire('error', { error: err });
             return;
         }
 
@@ -72,7 +72,7 @@ function Style(stylesheet, animationLoop) {
 
     browser.frame(stylesheetLoaded.bind(this, null, stylesheet));
 
-    this.on('source.load', function(event) {
+    this.on('source.load', function (event) {
         var source = event.source;
         if (source && source.vectorLayerIds) {
             for (var layerId in this._layers) {
@@ -88,7 +88,7 @@ function Style(stylesheet, animationLoop) {
 Style.prototype = util.inherit(Evented, {
     _loaded: false,
 
-    _validateLayer: function(layer) {
+    _validateLayer: function (layer) {
         var source = this.sources[layer.source];
 
         if (!layer.sourceLayer) return;
@@ -106,7 +106,7 @@ Style.prototype = util.inherit(Evented, {
         }
     },
 
-    loaded: function() {
+    loaded: function () {
         if (!this._loaded)
             return false;
 
@@ -123,11 +123,11 @@ Style.prototype = util.inherit(Evented, {
         return true;
     },
 
-    _resolve: function() {
+    _resolve: function () {
         var layer, layerJSON;
 
         this._layers = {};
-        this._order  = this.stylesheet.layers.map(function(layer) {
+        this._order = this.stylesheet.layers.map(function (layer) {
             return layer.id;
         });
 
@@ -154,7 +154,7 @@ Style.prototype = util.inherit(Evented, {
         this._updateWorkerLayers();
     },
 
-    _groupLayers: function() {
+    _groupLayers: function () {
         var group;
 
         this._groups = [];
@@ -173,25 +173,25 @@ Style.prototype = util.inherit(Evented, {
         }
     },
 
-    _updateWorkerLayers: function(ids) {
+    _updateWorkerLayers: function (ids) {
         this.dispatcher.broadcast(ids ? 'update layers' : 'set layers', this._serializeLayers(ids));
     },
 
-    _serializeLayers: function(ids) {
+    _serializeLayers: function (ids) {
         ids = ids || this._order;
         var serialized = [];
-        var options = {includeRefProperties: true};
+        var options = { includeRefProperties: true };
         for (var i = 0; i < ids.length; i++) {
             serialized.push(this._layers[ids[i]].serialize(options));
         }
         return serialized;
     },
 
-    _applyClasses: function(classes, options) {
+    _applyClasses: function (classes, options) {
         if (!this._loaded) return;
 
         classes = classes || [];
-        options = options || {transition: true};
+        options = options || { transition: true };
         var transition = this.stylesheet.transition || {};
 
         var layers = this._updates.allPaintProps ? this._layers : this._updates.paintProps;
@@ -210,7 +210,7 @@ Style.prototype = util.inherit(Evented, {
         }
     },
 
-    _recalculate: function(z) {
+    _recalculate: function (z) {
         for (var sourceId in this.sources)
             this.sources[sourceId].used = false;
 
@@ -234,7 +234,7 @@ Style.prototype = util.inherit(Evented, {
         this.z = z;
     },
 
-    _updateZoomHistory: function(z) {
+    _updateZoomHistory: function (z) {
 
         var zh = this.zoomHistory;
 
@@ -269,7 +269,7 @@ Style.prototype = util.inherit(Evented, {
      * Apply queued style updates in a batch
      * @private
      */
-    update: function(classes, options) {
+    update: function (classes, options) {
         if (!this._updates.changed) return this;
 
         if (this._updates.allLayers) {
@@ -304,7 +304,7 @@ Style.prototype = util.inherit(Evented, {
         return this;
     },
 
-    _resetUpdates: function() {
+    _resetUpdates: function () {
         this._updates = {
             events: [],
             layers: {},
@@ -313,7 +313,7 @@ Style.prototype = util.inherit(Evented, {
         };
     },
 
-    addSource: function(id, source) {
+    addSource: function (id, source) {
         this._checkLoaded();
         if (this.sources[id] !== undefined) {
             throw new Error('There is already a source with this ID');
@@ -338,7 +338,7 @@ Style.prototype = util.inherit(Evented, {
             .on('tile.remove', this._forwardTileEvent)
             .on('tile.stats', this._forwardTileEvent);
 
-        this._updates.events.push(['source.add', {source: source}]);
+        this._updates.events.push(['source.add', { source: source }]);
         this._updates.changed = true;
 
         return this;
@@ -351,7 +351,7 @@ Style.prototype = util.inherit(Evented, {
      * @throws {Error} if no source is found with the given ID
      * @private
      */
-    removeSource: function(id) {
+    removeSource: function (id) {
         this._checkLoaded();
 
         if (this.sources[id] === undefined) {
@@ -370,7 +370,7 @@ Style.prototype = util.inherit(Evented, {
             .off('tile.remove', this._forwardTileEvent)
             .off('tile.stats', this._forwardTileEvent);
 
-        this._updates.events.push(['source.remove', {source: source}]);
+        this._updates.events.push(['source.remove', { source: source }]);
         this._updates.changed = true;
 
         return this;
@@ -382,7 +382,7 @@ Style.prototype = util.inherit(Evented, {
      * @returns {Object} source
      * @private
      */
-    getSource: function(id) {
+    getSource: function (id) {
         return this.sources[id] && this.sources[id].getSource();
     },
 
@@ -395,13 +395,13 @@ Style.prototype = util.inherit(Evented, {
      * @returns {Style} `this`
      * @private
      */
-    addLayer: function(layer, before) {
+    addLayer: function (layer, before) {
         this._checkLoaded();
 
         if (!(layer instanceof StyleLayer)) {
             // this layer is not in the style.layers array, so we pass an impossible array index
             if (this._handleErrors(validateStyle.layer,
-                    'layers.' + layer.id, layer, false, {arrayIndex: -1})) return this;
+                'layers.' + layer.id, layer, false, { arrayIndex: -1 })) return this;
 
             var refLayer = layer.ref && this.getLayer(layer.ref);
             layer = StyleLayer.create(layer, refLayer);
@@ -417,7 +417,7 @@ Style.prototype = util.inherit(Evented, {
         if (layer.source) {
             this._updates.sources[layer.source] = true;
         }
-        this._updates.events.push(['layer.add', {layer: layer}]);
+        this._updates.events.push(['layer.add', { layer: layer }]);
 
         return this.updateClasses(layer.id);
     },
@@ -429,7 +429,7 @@ Style.prototype = util.inherit(Evented, {
      * @throws {Error} if no layer is found with the given ID
      * @private
      */
-    removeLayer: function(id) {
+    removeLayer: function (id) {
         this._checkLoaded();
 
         var layer = this._layers[id];
@@ -450,7 +450,7 @@ Style.prototype = util.inherit(Evented, {
         this._order.splice(this._order.indexOf(id), 1);
 
         this._updates.allLayers = true;
-        this._updates.events.push(['layer.remove', {layer: layer}]);
+        this._updates.events.push(['layer.remove', { layer: layer }]);
         this._updates.changed = true;
 
         return this;
@@ -463,7 +463,7 @@ Style.prototype = util.inherit(Evented, {
      * @returns {?Object} a layer, if one with the given `id` exists
      * @private
      */
-    getLayer: function(id) {
+    getLayer: function (id) {
         return this._layers[id];
     },
 
@@ -475,7 +475,7 @@ Style.prototype = util.inherit(Evented, {
      * @returns {Layer} the referent layer or the layer itself
      * @private
      */
-    getReferentLayer: function(id) {
+    getReferentLayer: function (id) {
         var layer = this.getLayer(id);
         if (layer.ref) {
             layer = this.getLayer(layer.ref);
@@ -483,7 +483,7 @@ Style.prototype = util.inherit(Evented, {
         return layer;
     },
 
-    setLayerZoomRange: function(layerId, minzoom, maxzoom) {
+    setLayerZoomRange: function (layerId, minzoom, maxzoom) {
         this._checkLoaded();
 
         var layer = this.getReferentLayer(layerId);
@@ -499,7 +499,7 @@ Style.prototype = util.inherit(Evented, {
         return this._updateLayer(layer);
     },
 
-    setFilter: function(layerId, filter) {
+    setFilter: function (layerId, filter) {
         this._checkLoaded();
 
         var layer = this.getReferentLayer(layerId);
@@ -518,11 +518,11 @@ Style.prototype = util.inherit(Evented, {
      * @returns {*} the layer's filter, if any
      * @private
      */
-    getFilter: function(layer) {
+    getFilter: function (layer) {
         return util.clone(this.getReferentLayer(layer).filter);
     },
 
-    setLayoutProperty: function(layerId, name, value) {
+    setLayoutProperty: function (layerId, name, value) {
         this._checkLoaded();
 
         var layer = this.getReferentLayer(layerId);
@@ -540,11 +540,11 @@ Style.prototype = util.inherit(Evented, {
      * @returns {*} the property value
      * @private
      */
-    getLayoutProperty: function(layer, name) {
+    getLayoutProperty: function (layer, name) {
         return this.getReferentLayer(layer).getLayoutProperty(name);
     },
 
-    setPaintProperty: function(layerId, name, value, klass) {
+    setPaintProperty: function (layerId, name, value, klass) {
         this._checkLoaded();
 
         var layer = this.getLayer(layerId);
@@ -571,7 +571,7 @@ Style.prototype = util.inherit(Evented, {
         return this.updateClasses(layerId, name);
     },
 
-    getPaintProperty: function(layer, name, klass) {
+    getPaintProperty: function (layer, name, klass) {
         return this.getLayer(layer).getPaintProperty(name, klass);
     },
 
@@ -587,7 +587,7 @@ Style.prototype = util.inherit(Evented, {
         return this;
     },
 
-    serialize: function() {
+    serialize: function () {
         return util.filterObject({
             version: this.stylesheet.version,
             name: this.stylesheet.name,
@@ -599,13 +599,13 @@ Style.prototype = util.inherit(Evented, {
             sprite: this.stylesheet.sprite,
             glyphs: this.stylesheet.glyphs,
             transition: this.stylesheet.transition,
-            sources: util.mapObject(this.sources, function(source) {
+            sources: util.mapObject(this.sources, function (source) {
                 return source.serialize();
             }),
-            layers: this._order.map(function(id) {
+            layers: this._order.map(function (id) {
                 return this._layers[id].serialize();
             }, this)
-        }, function(value) { return value !== undefined; });
+        }, function (value) { return value !== undefined; });
     },
 
     _updateLayer: function (layer) {
@@ -617,7 +617,7 @@ Style.prototype = util.inherit(Evented, {
         return this;
     },
 
-    _flattenRenderedFeatures: function(sourceResults) {
+    _flattenRenderedFeatures: function (sourceResults) {
         var features = [];
         for (var l = this._order.length - 1; l >= 0; l--) {
             var layerID = this._order[l];
@@ -633,7 +633,7 @@ Style.prototype = util.inherit(Evented, {
         return features;
     },
 
-    queryRenderedFeatures: function(queryGeometry, params, zoom, bearing) {
+    queryRenderedFeatures: function (queryGeometry, params, zoom, bearing) {
         if (params && params.filter) {
             this._handleErrors(validateStyle.filter, 'queryRenderedFeatures.filter', params.filter, true);
         }
@@ -656,7 +656,7 @@ Style.prototype = util.inherit(Evented, {
         return this._flattenRenderedFeatures(sourceResults);
     },
 
-    querySourceFeatures: function(sourceID, params) {
+    querySourceFeatures: function (sourceID, params) {
         if (params && params.filter) {
             this._handleErrors(validateStyle.filter, 'querySourceFeatures.filter', params.filter, true);
         }
@@ -681,7 +681,7 @@ Style.prototype = util.inherit(Evented, {
         }, callback);
     },
 
-    _handleErrors: function(validate, key, value, throws, props) {
+    _handleErrors: function (validate, key, value, throws, props) {
         var action = throws ? validateStyle.throwErrors : validateStyle.emitErrors;
         var result = validate.call(validateStyle, util.extend({
             key: key,
@@ -692,66 +692,66 @@ Style.prototype = util.inherit(Evented, {
         return action.call(validateStyle, this, result);
     },
 
-    _remove: function() {
+    _remove: function () {
         this.dispatcher.remove();
     },
 
-    _reloadSource: function(id) {
+    _reloadSource: function (id) {
         this.sources[id].reload();
     },
 
-    _updateSources: function(transform) {
+    _updateSources: function (transform) {
         for (var id in this.sources) {
             this.sources[id].update(transform);
         }
     },
 
-    _redoPlacement: function() {
+    _redoPlacement: function () {
         for (var id in this.sources) {
             if (this.sources[id].redoPlacement) this.sources[id].redoPlacement();
         }
     },
 
-    _forwardSourceEvent: function(e) {
-        this.fire('source.' + e.type, util.extend({source: e.target.getSource()}, e));
+    _forwardSourceEvent: function (e) {
+        this.fire('source.' + e.type, util.extend({ source: e.target.getSource() }, e));
     },
 
-    _forwardTileEvent: function(e) {
-        this.fire(e.type, util.extend({source: e.target}, e));
+    _forwardTileEvent: function (e) {
+        this.fire(e.type, util.extend({ source: e.target }, e));
     },
 
-    _forwardLayerEvent: function(e) {
-        this.fire('layer.' + e.type, util.extend({layer: {id: e.target.id}}, e));
+    _forwardLayerEvent: function (e) {
+        this.fire('layer.' + e.type, util.extend({ layer: { id: e.target.id } }, e));
     },
 
     // Callbacks from web workers
 
-    'get sprite json': function(mapId, params, callback) {
+    'get sprite json': function (mapId, params, callback) {
         var sprite = this.sprite;
         if (sprite.loaded()) {
             callback(null, { sprite: sprite.data, retina: sprite.retina });
         } else {
-            sprite.on('load', function() {
+            sprite.on('load', function () {
                 callback(null, { sprite: sprite.data, retina: sprite.retina });
             });
         }
     },
 
-    'get icons': function(mapId, params, callback) {
+    'get icons': function (mapId, params, callback) {
         var sprite = this.sprite;
         var spriteAtlas = this.spriteAtlas;
         if (sprite.loaded()) {
             spriteAtlas.setSprite(sprite);
             spriteAtlas.addIcons(params.icons, callback);
         } else {
-            sprite.on('load', function() {
+            sprite.on('load', function () {
                 spriteAtlas.setSprite(sprite);
                 spriteAtlas.addIcons(params.icons, callback);
             });
         }
     },
 
-    'get glyphs': function(mapId, params, callback) {
+    'get glyphs': function (mapId, params, callback) {
         var stacks = params.stacks,
             remaining = Object.keys(stacks).length,
             allGlyphs = {};
