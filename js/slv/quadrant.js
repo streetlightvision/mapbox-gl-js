@@ -30,7 +30,7 @@ Quadrant.findQuadrant = function (lng, lat, incX, incY) {
     else if (lng < -180) {
         lng += 360;
     }
-    
+
     return {
         col: Math.floor((lng + 180) / incX),
         row: Math.floor((90 - lat) / incY)
@@ -154,3 +154,8 @@ Quadrant.prototype.rebuildDepthSprites = function() {
     }
 };
 
+Quadrant.prototype.remove = function () {
+    this.staticGroups.forEach(function (staticGroup) {
+        staticGroup.remove();
+    });
+};

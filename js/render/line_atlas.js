@@ -143,3 +143,7 @@ LineAtlas.prototype.bind = function(gl) {
         }
     }
 };
+
+LineAtlas.prototype.remove = function() {
+    util.removeObjectProperties(this);
+};

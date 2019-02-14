@@ -681,6 +681,15 @@ Style.prototype = util.inherit(Evented, {
         }, callback);
     },
 
+    removeSources: function () {
+        util.removeObjectProperties(this.sources);
+        util.removeObjectProperties(this._updates.sources);
+
+        this.sprite.remove();
+        this.spriteAtlas.remove();
+        this.lineAtlas.remove();
+    },
+
     _handleErrors: function (validate, key, value, throws, props) {
         var action = throws ? validateStyle.throwErrors : validateStyle.emitErrors;
         var result = validate.call(validateStyle, util.extend({

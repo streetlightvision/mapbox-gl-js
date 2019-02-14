@@ -1,5 +1,7 @@
 'use strict';
 
+var util = require('../util/util');
+
 module.exports = PointGroup;
 
 function PointGroup(customBufferManager, quadrant) {
@@ -125,4 +127,8 @@ PointGroup.prototype.removeMarker = function (marker) {
         this.needsRefresh = true;
         this.rebuild();
     }
+};
+
+PointGroup.prototype.remove = function () {
+    util.removeObjectProperties(this);
 };
