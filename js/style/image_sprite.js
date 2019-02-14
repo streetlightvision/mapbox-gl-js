@@ -1,5 +1,5 @@
 'use strict';
-
+var util = require('../util/util');
 var Evented = require('../util/evented');
 var ajax = require('../util/ajax');
 var browser = require('../util/browser');
@@ -76,4 +76,12 @@ ImageSprite.prototype.getSpritePosition = function(name) {
     if (pos && this.img) return pos;
 
     return new SpritePosition();
+};
+
+ImageSprite.prototype.remove = function() {
+    delete this.img.data.buffer;
+
+    util.removeObjectProperties(this.img);
+    util.removeObjectProperties(this.data);
+    util.removeObjectProperties(this);
 };

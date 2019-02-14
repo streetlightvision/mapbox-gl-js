@@ -492,3 +492,7 @@ Painter.prototype.showOverdrawInspector = function(enabled) {
         gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
     }
 };
+
+Painter.prototype.remove = function () {
+    util.removeObjectProperties(this);
+};

@@ -512,3 +512,11 @@ exports.isClosedPolygon = function(points) {
     // polygon simplification can produce polygons with zero area and more than 3 points
     return (Math.abs(exports.calculateSignedArea(points)) > 0.01);
 };
+
+exports.removeObjectProperties = function (object) {
+    Object.keys(object).forEach(function (property) {
+        if (object.hasOwnProperty(property)) {
+            delete object[property];
+        }
+    });
+};

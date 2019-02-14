@@ -20,3 +20,9 @@ QuadrantFactory.prototype.createQuadrant = function (row, col) {
 QuadrantFactory.prototype.getQuadrant = function (id) {
     return this.quadrants[id];
 };
+
+QuadrantFactory.prototype.remove = function () {
+    this.quadrants.forEach(function (quadrant) {
+        quadrant.remove();
+    });
+};

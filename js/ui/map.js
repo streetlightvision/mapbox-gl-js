@@ -1345,15 +1345,19 @@ util.extend(Map.prototype, /** @lends Map.prototype */{
     remove: function() {
         if (this._hash) this._hash.remove();
         browser.cancelFrame(this._frameId);
+        this.style.removeSources();
         this.setStyle(null);
+        this.quadrantFactory.remove();
         if (typeof window !== 'undefined') {
             window.removeEventListener('resize', this._onWindowResize, false);
         }
         var extension = this.painter.gl.getExtension('WEBGL_lose_context');
         if (extension) extension.loseContext();
+        this.painter.remove();
         removeNode(this._canvasContainer);
         removeNode(this._controlContainer);
         this._container.classList.remove('mapboxgl-map');
+        util.removeObjectProperties(this);
     },
 
     _rerender: function() {

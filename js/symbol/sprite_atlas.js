@@ -222,6 +222,12 @@ SpriteAtlas.prototype.bind = function(gl, linear) {
     }
 };
 
+SpriteAtlas.prototype.remove = function () {
+    // delete this.texture;
+    util.removeObjectProperties(this.images);
+    util.removeObjectProperties(this);
+};
+
 function AtlasImage(rect, width, height, sdf, pixelRatio) {
     this.rect = rect;
     this.width = width;
