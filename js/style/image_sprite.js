@@ -79,8 +79,10 @@ ImageSprite.prototype.getSpritePosition = function(name) {
 };
 
 ImageSprite.prototype.remove = function() {
-    delete this.img.data.buffer;
-
+    if (this.img && this.img.data) {
+        delete this.img.data.buffer;
+    }
+    
     util.removeObjectProperties(this.img);
     util.removeObjectProperties(this.data);
     util.removeObjectProperties(this);
