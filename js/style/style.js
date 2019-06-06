@@ -221,7 +221,7 @@ Style.prototype = util.inherit(Evented, {
             var layer = this._layers[layerId];
 
             layer.recalculate(z, this.zoomHistory);
-            if (!layer.isHidden(z) && layer.source) {
+            if (!layer.isHidden(z) && layer.source && this.sources[layer.source]) {
                 this.sources[layer.source].used = true;
             }
         }
