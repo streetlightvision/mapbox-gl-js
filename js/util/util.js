@@ -514,9 +514,13 @@ exports.isClosedPolygon = function(points) {
 };
 
 exports.removeObjectProperties = function (object) {
-    Object.keys(object).forEach(function (property) {
-        if (object.hasOwnProperty(property)) {
-            delete object[property];
-        }
-    });
+    var objectKeys = object && Object.keys(object);
+
+    if (objectKeys) {
+        objectKeys.forEach(function (property) {
+            if (object.hasOwnProperty(property)) {
+                delete object[property];
+            }
+        });
+    }
 };
