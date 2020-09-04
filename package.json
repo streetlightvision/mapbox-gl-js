@@ -54,7 +54,7 @@
     "eslint-config-mourner": "^2.0.0",
     "eslint-plugin-html": "^1.5.1",
     "gl": "^4.0.1",
-    "handlebars": "4.0.5",
+    "handlebars": "4.7.6",
     "highlight.js": "9.3.0",
     "istanbul": "^0.4.2",
     "jsdom": "^9.4.2",
